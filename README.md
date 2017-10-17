@@ -1,11 +1,18 @@
-Project Page
-=============
-http://nsetools.readthedocs.io
+# Objective
 
-Updates
-=========
+This project is a fork of [nsetools](https://github.com/vsjha18/nsetools). The main objective of this project is to modify the API to a more data centric approach and to fix the flaws already existing.
 
-To stay updated please subscribe to google group https://groups.google.com/forum/#!forum/nsetools
+Planned functionalities
+
+1. Using pandas to aid management of data
+2. Add proper caching facility wherever possible
+
+While implementing these changes we will try to keep the usage method as close to original as possible
+
+To achieve this we will have to make a few breaking changes.
+
+1. **Python 2 compatibility.** We cannot ensure python 2 compatibility. Although this project will work with python 3+
+2. **DataFrames instead of dictionaries.** We will be using pandas dataframes wherever possible instead of dictionaries and lists. This will allow us to add complicated functionalities.
 
 nsetools
 ========
@@ -31,9 +38,11 @@ Main Features:
 
 Dependencies
 =============
-To keep it simple and supported on most of the platforms, it uses only core python libraries, hence there are no external dependencies. It can be used out of box and absolutely not set up is required except an internet connection.
+It is advised to use [Anaconda python 3.6](https://www.anaconda.com/download/) as there is extensive use of pandas along with other libraries.
+
+Note: To use the API you will need an active internet connection
 
 Detailed Documenation 
 =====================
 
-For complete documenation, please refer http://nsetools.readthedocs.io
+For complete documenation of the  original project, please refer http://nsetools.readthedocs.io
