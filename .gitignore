@@ -12,7 +12,7 @@ __pycache__/
 # Visual studio generated files
 *.vs
 *.pyproj*
-*.sln
+*.sln*
 
 # Distribution / packaging
 .Python
