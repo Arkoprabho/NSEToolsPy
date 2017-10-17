@@ -22,9 +22,9 @@
     SOFTWARE.
 
 """
-import six
 import re
 import sys
+import io
 
 def byte_adaptor(fbuffer):
     """ provides py3 compatibility by converting byte based
@@ -36,12 +36,9 @@ def byte_adaptor(fbuffer):
     Returns:
         string buffer
     """
-    if six.PY3:
-        strings = fbuffer.read().decode('latin-1')
-        fbuffer = six.StringIO(strings)
-        return fbuffer
-    else:
-        return fbuffer
+    strings = fbuffer.read().decode('latin-1')
+    fbuffer = io.StringIO(strings)
+    return fbuffer
 
 
 def js_adaptor(buffer):

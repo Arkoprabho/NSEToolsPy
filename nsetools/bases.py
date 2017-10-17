@@ -23,13 +23,12 @@
 """
 
 from abc import ABCMeta, abstractmethod
-import six
 
 
-class AbstractBaseExchange(six.with_metaclass(ABCMeta, object)):
+class AbstractBaseExchange(metaclass=ABCMeta):
 
     @abstractmethod
-    def get_stock_codes(self):
+    def get_stock_codes(self, cached, as_json):
         """
         :return: list of tuples with stock code and stock name
         """

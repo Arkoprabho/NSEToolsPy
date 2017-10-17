@@ -22,21 +22,14 @@
     SOFTWARE.
 
 """
-import sys
-import six
-
-# import paths differ in python 2 and python 3
-if six.PY2:
-    from urllib2 import build_opener, HTTPCookieProcessor, Request
-    from urllib import urlencode
-    from cookielib import CookieJar
-elif six.PY3:
-    from urllib.request import build_opener, HTTPCookieProcessor, Request
-    from urllib.parse import urlencode
-    from http.cookiejar import CookieJar
 import ast
 import re
 import json
+
+from urllib.request import build_opener, HTTPCookieProcessor, Request
+from urllib.parse import urlencode
+from http.cookiejar import CookieJar
+
 from nsetools.bases import AbstractBaseExchange
 from nsetools.utils import byte_adaptor
 from nsetools.utils import js_adaptor
@@ -57,6 +50,7 @@ class Nse(AbstractBaseExchange):
         self.stocks_csv_url = 'http://www.nseindia.com/content/equities/EQUITY_L.csv'
         self.top_gainer_url = 'http://www.nseindia.com/live_market/dynaContent/live_analysis/gainers/niftyGainers1.json'
         self.top_loser_url = 'http://www.nseindia.com/live_market/dynaContent/live_analysis/losers/niftyLosers1.json'
+        self.top_volume_url = 'http://www.nseindia.com/live_market/dynaContent/live_analysis/volume_spurts/volume_spurts.json'
         self.advances_declines_url = 'http://www.nseindia.com/common/json/indicesAdvanceDeclines.json'
         self.index_url = "http://www.nseindia.com/homepage/Indices1.json"
 
@@ -74,7 +68,6 @@ class Nse(AbstractBaseExchange):
             # raises HTTPError and URLError
             res = self.opener.open(req)
             if res is not None:
-                # for py3 compat covert byte file like object to
                 # string file like object
                 res = byte_adaptor(res)
                 for line in res.read().split('\n'):
@@ -96,8 +89,7 @@ class Nse(AbstractBaseExchange):
             stock_codes = self.get_stock_codes()
             if code.upper() in stock_codes.keys():
                 return True
-            else:
-                return False
+            return False
 
     def get_quote(self, code, as_json=False):
         """
@@ -114,8 +106,6 @@ class Nse(AbstractBaseExchange):
             # north bound APIs should use it for exception handling
             res = self.opener.open(req)
 
-            # for py3 compat covert byte file like object to
-            # string file like object
             res = byte_adaptor(res)
 
             # Now parse the response to get the relevant data
@@ -144,8 +134,6 @@ class Nse(AbstractBaseExchange):
         req = Request(url, None, self.headers)
         # this can raise HTTPError and URLError
         res = self.opener.open(req)
-        # for py3 compat covert byte file like object to
-        # string file like object
         res = byte_adaptor(res)
         res_dict = json.load(res)
         # clean the output and make appropriate type conversions
@@ -161,13 +149,27 @@ class Nse(AbstractBaseExchange):
         req = Request(url, None, self.headers)
         # this can raise HTTPError and URLError
         res = self.opener.open(req)
-        # for py3 compat covert byte file like object to
         # string file like object
         res = byte_adaptor(res)
         res_dict = json.load(res)
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(item)
                     for item in res_dict['data']]
+        return self.render_response(res_list, as_json)
+
+    def get_top_volume(self, as_json=False):
+        """
+        :return: a lis of dictionaries containing top volume gainers of the day
+        """
+        url = self.top_volume_url
+        req = Request(url, None, self.headers)
+        # this can raise HTTPError and URLError
+        res = self.opener.open(req)
+        res = byte_adaptor(res)
+        res_dict = json.load(res)
+        # clean the output and make appropriate type conversions
+        res_list = [self.clean_server_response(
+            item) for item in res_dict['data']]
         return self.render_response(res_list, as_json)
 
     def get_advances_declines(self, as_json=False):
@@ -179,7 +181,6 @@ class Nse(AbstractBaseExchange):
         req = Request(url, None, self.headers)
         # raises URLError or HTTPError
         resp = self.opener.open(req)
-        # for py3 compat covert byte file like object to
         # string file like object
         resp = byte_adaptor(resp)
         resp_dict = json.load(resp)
@@ -284,7 +285,7 @@ class Nse(AbstractBaseExchange):
             d[str(key)] = value
         resp_dict = d
         for key, value in resp_dict.items():
-            if type(value) is str or isinstance(value, six.string_types):
+            if type(value) is str:
                 if '-' == value:
                     resp_dict[key] = None
                 elif re.search(r'^[-]?[0-9,.]+$', value):
@@ -307,6 +308,7 @@ class Nse(AbstractBaseExchange):
         """
         return 'Driver Class for National Stock Exchange (NSE)'
 
+# TODO: Use pandas dataframes
 # TODO: get_most_active()
 # TODO: get_top_volume()
 # TODO: get_peer_companies()
