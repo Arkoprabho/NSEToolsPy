@@ -9,6 +9,10 @@ __pycache__/
 .coverage
 .ropeproject/
 *~
+# Visual studio generated files
+*.vs
+*.pyproj*
+*.sln
 
 # Distribution / packaging
 .Python
