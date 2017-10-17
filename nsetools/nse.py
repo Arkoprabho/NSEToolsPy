@@ -51,6 +51,7 @@ class Nse(AbstractBaseExchange):
         self.top_gainer_url = 'http://www.nseindia.com/live_market/dynaContent/live_analysis/gainers/niftyGainers1.json'
         self.top_loser_url = 'http://www.nseindia.com/live_market/dynaContent/live_analysis/losers/niftyLosers1.json'
         self.top_volume_url = 'http://www.nseindia.com/live_market/dynaContent/live_analysis/volume_spurts/volume_spurts.json'
+        self.most_active_url = 'https://nseindia.com/live_market/dynaContent/live_analysis/most_active/allTopValue1.json'
         self.advances_declines_url = 'http://www.nseindia.com/common/json/indicesAdvanceDeclines.json'
         self.index_url = "http://www.nseindia.com/homepage/Indices1.json"
 
@@ -162,6 +163,21 @@ class Nse(AbstractBaseExchange):
         :return: a lis of dictionaries containing top volume gainers of the day
         """
         url = self.top_volume_url
+        req = Request(url, None, self.headers)
+        # this can raise HTTPError and URLError
+        res = self.opener.open(req)
+        res = byte_adaptor(res)
+        res_dict = json.load(res)
+        # clean the output and make appropriate type conversions
+        res_list = [self.clean_server_response(
+            item) for item in res_dict['data']]
+        return self.render_response(res_list, as_json)
+
+    def get_most_active(self, as_json=False):
+        """
+        :return: a lis of dictionaries containing most active equites of the day
+        """
+        url = self.most_active_url
         req = Request(url, None, self.headers)
         # this can raise HTTPError and URLError
         res = self.opener.open(req)
@@ -309,8 +325,6 @@ class Nse(AbstractBaseExchange):
         return 'Driver Class for National Stock Exchange (NSE)'
 
 # TODO: Use pandas dataframes
-# TODO: get_most_active()
-# TODO: get_top_volume()
 # TODO: get_peer_companies()
 # TODO: is_market_open()
 # TODO: concept of portfolio for fetching price in a batch and field which should be captured

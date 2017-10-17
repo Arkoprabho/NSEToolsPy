@@ -129,9 +129,22 @@ class TestCoreAPIs(unittest.TestCase):
         res = self.nse.get_top_losers()
         self.assertIsInstance(res, list)
 
+        res = self.nse.get_top_losers(as_json=True)
+        self.assertIsInstance(res, str)
+
     def test_get_top_volume(self):
         res = self.nse.get_top_volume()
         self.assertIsInstance(res, list)
+
+        res = self.nse.get_top_volume(as_json=True)
+        self.assertIsInstance(res, str)
+
+    def test_get_most_active(self):
+        res = self.nse.get_most_active()
+        self.assertIsInstance(res, list)
+
+        res = self.nse.get_most_active(as_json=True)
+        self.assertIsInstance(res, str)
 
     def test_render_response(self):
         d = {'fname':'vivek', 'lname':'jha'}
