@@ -129,6 +129,10 @@ class TestCoreAPIs(unittest.TestCase):
         res = self.nse.get_top_losers()
         self.assertIsInstance(res, list)
 
+    def test_get_top_volume(self):
+        res = self.nse.get_top_volume()
+        self.assertIsInstance(res, list)
+
     def test_render_response(self):
         d = {'fname':'vivek', 'lname':'jha'}
         resp_dict = self.nse.render_response(d)
@@ -191,14 +195,9 @@ class TestCoreAPIs(unittest.TestCase):
         self.assertEqual(ret, expected_buffer)
 
     def test_byte_adaptor(self):
-        if six.PY2:
-            from StringIO import StringIO
-            buffer = 'nsetools'
-            fbuffer = StringIO(buffer)
-        else:
-            from io import BytesIO
-            buffer = b'nsetools'
-            fbuffer = BytesIO(buffer)
+        from io import BytesIO
+        buffer = b'nsetools'
+        fbuffer = BytesIO(buffer)
         ret_file_buffer = byte_adaptor(fbuffer)
         self.assertIsInstance(ret_file_buffer, six.StringIO)
 
