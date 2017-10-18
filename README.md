@@ -46,3 +46,4 @@ Detailed Documenation
 =====================
 
 For complete documenation of the  original project, please refer http://nsetools.readthedocs.io
+For complete documentation of this project refer to https://arkoprabho.github.io/nsetools3/
