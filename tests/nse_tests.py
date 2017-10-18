@@ -45,12 +45,17 @@ class TestCoreAPIs(unittest.TestCase):
             with self.assertRaises(Exception):
                 for test_code in negative_codes:
                     url = self.nse.build_url_for_quote(test_code)
+    def test_get_peer_companies(self):
+        code = 'infy'
+        response = self.nse.get_peer_companies(code)
+        self.assertIsInstance(response, list)
+        self.assertIsInstance(response[0], dict)
 
     def test_response_cleaner(self):
         test_dict = {
             'a': '10',
             'b': '10.0',
-            'c': '1,000.10',
+            'c': '-1,000.10',
             'd': 'vsjha18',
             'e': 10,
             'f': 10.0,
@@ -65,7 +70,7 @@ class TestCoreAPIs(unittest.TestCase):
         expected_dict = {
             'a': 10,
             'b': 10.0,
-            'c': 1000.10,
+            'c': -1000.10,
             'd': 'vsjha18',
             'e': 10,
             'f': 10.0,

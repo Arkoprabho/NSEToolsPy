@@ -54,6 +54,7 @@ class Nse(AbstractBaseExchange):
         self.most_active_url = 'https://nseindia.com/live_market/dynaContent/live_analysis/most_active/allTopValue1.json'
         self.advances_declines_url = 'http://www.nseindia.com/common/json/indicesAdvanceDeclines.json'
         self.index_url = "http://www.nseindia.com/homepage/Indices1.json"
+        self.peer_companies_url = 'https://nseindia.com/live_market/dynaContent/live_watch/get_quote/ajaxPeerCompanies.jsp?symbol='
 
     def get_stock_codes(self, cached=True, as_json=False):
         """
@@ -126,6 +127,39 @@ class Nse(AbstractBaseExchange):
                 return self.render_response(response, as_json)
         else:
             return None
+
+    def get_peer_companies(self, code, as_json=False):
+        """
+        :returns: a list of peer companies
+        """
+        code = code.upper()
+        if self.is_valid_code(code):
+            url = self.peer_companies_url + code
+            req = Request(url, None, self.headers)
+            res = self.opener.open(req)
+
+            res = byte_adaptor(res)
+
+            # We need to filter the data from this. The data is at an offset of 39 from the beginning and 8 at the end
+            res = res.read()[39:-8]
+
+            # Now comes the tricky batshit crazy part.
+            # We will iteratively filter each company and append them to a list
+            # HACK: the solution is very messy. Would be nice if a better cleaner solution can be found.
+            start = 0
+            data = []
+            for item in re.finditer(r'({*})', res):
+                # The second item. We want the curly brace for json parsing
+                end = item.span()[1]
+                # This is the actual data we are interested in
+                string = res[start:end]
+                company_info = json.loads(string)
+                # We dont care about this. Throw it out
+                del(company_info['industry'])
+                data.append(company_info)
+                start = end + 1
+
+            return data
 
     def get_top_gainers(self, as_json=False):
         """
@@ -324,8 +358,7 @@ class Nse(AbstractBaseExchange):
         """
         return 'Driver Class for National Stock Exchange (NSE)'
 
+# TODO: is_market_open(), close price is 0.0 when market is open
 # TODO: Use pandas dataframes
-# TODO: get_peer_companies()
-# TODO: is_market_open()
 # TODO: concept of portfolio for fetching price in a batch and field which should be captured
 # TODO: Concept of session, just like as in sqlalchemy
