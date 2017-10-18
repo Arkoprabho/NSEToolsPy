@@ -156,7 +156,7 @@ class TestCoreAPIs(unittest.TestCase):
         self.assertIsInstance(res, str)
 
     def test_render_response(self):
-        d = {'fname':'vivek', 'lname':'jha'}
+        d = {'fname':'Arkoprabho', 'lname':'Chakraborti'}
         resp_dict = self.nse.render_response(d)
         resp_json = self.nse.render_response(d, as_json=True)
         # in case of dict, response should be a python dict

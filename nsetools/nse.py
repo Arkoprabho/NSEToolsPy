@@ -1,7 +1,7 @@
 """
     The MIT License (MIT)
 
-    Copyright (c) 2014 Vivek Jha
+    Copyright (c) 2014 Arkoprabho Chakraborti
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -371,7 +371,6 @@ class Nse(AbstractBaseExchange):
         """
         return 'Driver Class for National Stock Exchange (NSE)'
 
-# TODO: is_market_open(), close price is 0.0 when market is open
 # TODO: Use pandas dataframes
 # TODO: concept of portfolio for fetching price in a batch and field which should be captured
 # TODO: Concept of session, just like as in sqlalchemy
