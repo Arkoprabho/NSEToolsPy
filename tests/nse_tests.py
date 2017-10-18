@@ -51,6 +51,10 @@ class TestCoreAPIs(unittest.TestCase):
         self.assertIsInstance(response, list)
         self.assertIsInstance(response[0], dict)
 
+    def test_market_status(self):
+        result = self.nse.market_status()
+        self.assertIsInstance(result, bool)
+
     def test_response_cleaner(self):
         test_dict = {
             'a': '10',

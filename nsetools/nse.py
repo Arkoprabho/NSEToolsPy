@@ -55,6 +55,8 @@ class Nse(AbstractBaseExchange):
         self.advances_declines_url = 'http://www.nseindia.com/common/json/indicesAdvanceDeclines.json'
         self.index_url = "http://www.nseindia.com/homepage/Indices1.json"
         self.peer_companies_url = 'https://nseindia.com/live_market/dynaContent/live_watch/get_quote/ajaxPeerCompanies.jsp?symbol='
+        # None indicates that the default value is stored and we havent checked for it.
+        self.is_market_open = (False, None)
 
     def get_stock_codes(self, cached=True, as_json=False):
         """
@@ -124,10 +126,21 @@ class Nse(AbstractBaseExchange):
             except SyntaxError as err:
                 raise Exception('ill formatted response')
             else:
-                return self.render_response(response, as_json)
+                rendered_response = self.render_response(response, as_json)
+                # Check if the market is open (to avoid repeated network computation)
+                if not as_json and rendered_response['closePrice'] != 0.0:
+                    self.is_market_open = (True, 1)
+                return rendered_response
         else:
             return None
 
+    def market_status(self):
+        if self.is_market_open[1] is not None:
+            return self.is_market_open[0]
+        else:
+            # Get a random quote to set the market status
+            self.get_quote('infy')
+        return self.is_market_open[0]
     def get_peer_companies(self, code, as_json=False):
         """
         :returns: a list of peer companies
