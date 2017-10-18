@@ -1,26 +1,5 @@
 """
-    The MIT License (MIT)
-
-    Copyright (c) 2014 Arkoprabho Chakraborti
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-
+Contains the core APIs
 """
 import ast
 import re
@@ -254,11 +233,9 @@ class Nse(AbstractBaseExchange):
     def get_index_list(self, as_json=False):
         """
         get list of indices and codes
-        params:
-            as_json: True | False
+        params: as_json: True | False
         returns: a list | json of index codes
         """
-
         url = self.index_url
         req = Request(url, None, self.headers)
         # raises URLError or HTTPError
@@ -338,12 +315,11 @@ class Nse(AbstractBaseExchange):
     def clean_server_response(self, resp_dict):
         """
         cleans the server reponse by replacing:
-            '-'     -> None
-            '1,000' -> 1000
+            '-'     -> None\n
+            '1,000' -> 1000\n
         :param resp_dict:
         :return: dict with all above substitution
         """
-
         # change all the keys from unicode to string
         d = {}
         for key, value in resp_dict.items():
