@@ -129,7 +129,7 @@ class Nse(AbstractBaseExchange):
                 rendered_response = self.render_response(response, as_json)
                 # Check if the market is open (to avoid repeated network computation)
                 if not as_json and rendered_response['closePrice'] != 0.0:
-                    self.is_market_open = (True, 1)
+                    self.is_market_open = (False, 1)
                 return rendered_response
         else:
             return None
