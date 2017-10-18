@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Welcome to nsetools3’s documentation! &#8212; nsetools3 1 documentation</title>
+    <title>Welcome to nsetools3’s documentation! &#8212; nsetools3 1.0.6 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1',
+        VERSION:     '1.0.6',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -62,12 +62,12 @@ SOFTWARE.</p>
 <span class="target" id="module-nsetools.nse"></span><p>Contains the core APIs</p>
 <dl class="class">
 <dt id="nsetools.nse.Nse">
-<em class="property">class </em><code class="descclassname">nsetools.nse.</code><code class="descname">Nse</code><a class="headerlink" href="#nsetools.nse.Nse" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">nsetools.nse.</code><code class="descname">Nse</code><a class="reference internal" href="_modules/nsetools/nse.html#Nse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse" title="Permalink to this definition">¶</a></dt>
 <dd><p>class which implements all the functionality for
 National Stock Exchange</p>
 <dl class="method">
 <dt id="nsetools.nse.Nse.build_url_for_quote">
-<code class="descname">build_url_for_quote</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.build_url_for_quote" title="Permalink to this definition">¶</a></dt>
+<code class="descname">build_url_for_quote</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.build_url_for_quote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.build_url_for_quote" title="Permalink to this definition">¶</a></dt>
 <dd><p>builds a url which can be requested for a given stock code
 :param code: string containing stock code.
 :return: a url object</p>
@@ -75,7 +75,7 @@ National Stock Exchange</p>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.clean_server_response">
-<code class="descname">clean_server_response</code><span class="sig-paren">(</span><em>resp_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.clean_server_response" title="Permalink to this definition">¶</a></dt>
+<code class="descname">clean_server_response</code><span class="sig-paren">(</span><em>resp_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.clean_server_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.clean_server_response" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>cleans the server reponse by replacing:</dt>
 <dd><p class="first">‘-‘     -&gt; None</p>
@@ -96,7 +96,7 @@ National Stock Exchange</p>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_advances_declines">
-<code class="descname">get_advances_declines</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_advances_declines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_advances_declines</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_advances_declines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_advances_declines" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -111,7 +111,7 @@ National Stock Exchange</p>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_index_list">
-<code class="descname">get_index_list</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_index_list" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_index_list</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_index_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_index_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>get list of indices and codes
 params: as_json: True | False
 returns: a list | json of index codes</p>
@@ -119,7 +119,7 @@ returns: a list | json of index codes</p>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_index_quote">
-<code class="descname">get_index_quote</code><span class="sig-paren">(</span><em>code</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_index_quote" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_index_quote</code><span class="sig-paren">(</span><em>code</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_index_quote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_index_quote" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>params:</dt>
 <dd>code : string index code
@@ -131,7 +131,7 @@ as_json: True|False</dd>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_most_active">
-<code class="descname">get_most_active</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_most_active" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_most_active</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_most_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_most_active" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -144,7 +144,7 @@ as_json: True|False</dd>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_peer_companies">
-<code class="descname">get_peer_companies</code><span class="sig-paren">(</span><em>code</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_peer_companies" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_peer_companies</code><span class="sig-paren">(</span><em>code</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_peer_companies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_peer_companies" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -157,7 +157,7 @@ as_json: True|False</dd>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_quote">
-<code class="descname">get_quote</code><span class="sig-paren">(</span><em>code</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_quote" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_quote</code><span class="sig-paren">(</span><em>code</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_quote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_quote" title="Permalink to this definition">¶</a></dt>
 <dd><p>gets the quote for a given stock code
 :param code:
 :return: dict or None
@@ -166,7 +166,7 @@ as_json: True|False</dd>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_stock_codes">
-<code class="descname">get_stock_codes</code><span class="sig-paren">(</span><em>cached=True</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_stock_codes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_stock_codes</code><span class="sig-paren">(</span><em>cached=True</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_stock_codes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_stock_codes" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns a dictionary with key as stock code and value as stock name.
 It also implements cache functionality and hits the server only
 if user insists or cache is empty
@@ -175,7 +175,7 @@ if user insists or cache is empty
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_top_gainers">
-<code class="descname">get_top_gainers</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_top_gainers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_top_gainers</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_top_gainers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_top_gainers" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -188,7 +188,7 @@ if user insists or cache is empty
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_top_losers">
-<code class="descname">get_top_losers</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_top_losers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_top_losers</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_top_losers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_top_losers" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -201,7 +201,7 @@ if user insists or cache is empty
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.get_top_volume">
-<code class="descname">get_top_volume</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.get_top_volume" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_top_volume</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_top_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_top_volume" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -214,7 +214,7 @@ if user insists or cache is empty
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.is_valid_code">
-<code class="descname">is_valid_code</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.is_valid_code" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_valid_code</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.is_valid_code"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.is_valid_code" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -229,20 +229,20 @@ if user insists or cache is empty
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.is_valid_index">
-<code class="descname">is_valid_index</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.is_valid_index" title="Permalink to this definition">¶</a></dt>
+<code class="descname">is_valid_index</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.is_valid_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.is_valid_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns: True | Flase , based on whether code is valid</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.nse_headers">
-<code class="descname">nse_headers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.nse_headers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">nse_headers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.nse_headers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.nse_headers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds right set of headers for requesting <a class="reference external" href="http://nseindia.com">http://nseindia.com</a>
 :return: a dict with http headers</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="nsetools.nse.Nse.nse_opener">
-<code class="descname">nse_opener</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.nse.Nse.nse_opener" title="Permalink to this definition">¶</a></dt>
+<code class="descname">nse_opener</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.nse_opener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.nse_opener" title="Permalink to this definition">¶</a></dt>
 <dd><p>builds opener for urllib2
 :return: opener object</p>
 </dd></dl>
@@ -253,7 +253,7 @@ if user insists or cache is empty
 <span class="target" id="module-nsetools.utils"></span><p>Contains utility funtions to aid parsing</p>
 <dl class="function">
 <dt id="nsetools.utils.byte_adaptor">
-<code class="descclassname">nsetools.utils.</code><code class="descname">byte_adaptor</code><span class="sig-paren">(</span><em>fbuffer</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.utils.byte_adaptor" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nsetools.utils.</code><code class="descname">byte_adaptor</code><span class="sig-paren">(</span><em>fbuffer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/utils.html#byte_adaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.utils.byte_adaptor" title="Permalink to this definition">¶</a></dt>
 <dd><p>provides py3 compatibility by converting byte based
 file stream to string based file stream</p>
 <dl class="docutils">
@@ -266,7 +266,7 @@ file stream to string based file stream</p>
 
 <dl class="function">
 <dt id="nsetools.utils.js_adaptor">
-<code class="descclassname">nsetools.utils.</code><code class="descname">js_adaptor</code><span class="sig-paren">(</span><em>buffer</em><span class="sig-paren">)</span><a class="headerlink" href="#nsetools.utils.js_adaptor" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">nsetools.utils.</code><code class="descname">js_adaptor</code><span class="sig-paren">(</span><em>buffer</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/utils.html#js_adaptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.utils.js_adaptor" title="Permalink to this definition">¶</a></dt>
 <dd><p>convert javascript objects like true, none, NaN etc. to
 quoted word.</p>
 <dl class="docutils">
@@ -326,7 +326,7 @@ quoted word.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2017, arko.
+      &copy;2017, Arkoprabho Chakraborti.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
