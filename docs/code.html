@@ -77,29 +77,6 @@ National Stock Exchange</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="nsetools.nse.Nse.get_advances_declines">
-<code class="descname">get_advances_declines</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_advances_declines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_advances_declines" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a list of dictionaries with advance decline data</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">URLError, HTTPError</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="nsetools.nse.Nse.get_index_list">
-<code class="descname">get_index_list</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_index_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_index_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>get list of indices and codes
-params: as_json: True | False
-returns: a list | json of index codes</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="nsetools.nse.Nse.get_index_quote">
 <code class="descname">get_index_quote</code><span class="sig-paren">(</span><em>code</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_index_quote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_index_quote" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
@@ -109,19 +86,6 @@ as_json: True|False</dd>
 <dt>returns:</dt>
 <dd>a dict | json quote for the given index</dd>
 </dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="nsetools.nse.Nse.get_most_active">
-<code class="descname">get_most_active</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_most_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_most_active" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a lis of dictionaries containing most active equites of the day</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
@@ -156,39 +120,28 @@ if user insists or cache is empty
 </dd></dl>
 
 <dl class="method">
-<dt id="nsetools.nse.Nse.get_top_gainers">
-<code class="descname">get_top_gainers</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_top_gainers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_top_gainers" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dt id="nsetools.nse.Nse.get_top">
+<code class="descname">get_top</code><span class="sig-paren">(</span><em>*options</em>, <em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_top"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_top" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the top list of the argument specified.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a list of dictionaries containing top gainers of the day</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="nsetools.nse.Nse.get_top_losers">
-<code class="descname">get_top_losers</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_top_losers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_top_losers" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dl class="docutils">
+<dt>as_json: bool</dt>
+<dd>Whether to return a json like string, or dict.</dd>
+<dt>option: string</dt>
+<dd>What to get top of. Possible values: gainers, losers, volume, active, advances decline, index list</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a list of dictionaries containing top losers of the day</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="nsetools.nse.Nse.get_top_volume">
-<code class="descname">get_top_volume</code><span class="sig-paren">(</span><em>as_json=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.get_top_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.get_top_volume" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a lis of dictionaries containing top volume gainers of the day</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">generator that can be used to iterate over the data requested</td>
 </tr>
 </tbody>
 </table>
@@ -213,6 +166,13 @@ if user insists or cache is empty
 <dt id="nsetools.nse.Nse.is_valid_index">
 <code class="descname">is_valid_index</code><span class="sig-paren">(</span><em>code</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.is_valid_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.is_valid_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns: True | Flase , based on whether code is valid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nsetools.nse.Nse.market_status">
+<code class="descname">market_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nsetools/nse.html#Nse.market_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nsetools.nse.Nse.market_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether the market is open or not
+:returns: bool variable indicating status of market. True -&gt; Open, False -&gt; Closed</p>
 </dd></dl>
 
 <dl class="method">
@@ -258,7 +218,6 @@ quoted word.</p>
 </dl>
 </dd></dl>
 
-<span class="target" id="module-nsetools.bases"></span><p>The base class for all implementation</p>
 </div>
 
 

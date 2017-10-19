@@ -50,12 +50,11 @@
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlencode</span>
 <span class="kn">from</span> <span class="nn">http.cookiejar</span> <span class="k">import</span> <span class="n">CookieJar</span>
 
-<span class="kn">from</span> <span class="nn">nsetools.bases</span> <span class="k">import</span> <span class="n">AbstractBaseExchange</span>
 <span class="kn">from</span> <span class="nn">nsetools.utils</span> <span class="k">import</span> <span class="n">byte_adaptor</span>
 <span class="kn">from</span> <span class="nn">nsetools.utils</span> <span class="k">import</span> <span class="n">js_adaptor</span>
 
 
-<div class="viewcode-block" id="Nse"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse">[docs]</a><span class="k">class</span> <span class="nc">Nse</span><span class="p">(</span><span class="n">AbstractBaseExchange</span><span class="p">):</span>
+<div class="viewcode-block" id="Nse"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse">[docs]</a><span class="k">class</span> <span class="nc">Nse</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    class which implements all the functionality for</span>
 <span class="sd">    National Stock Exchange</span>
@@ -154,13 +153,17 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span></div>
 
-    <span class="k">def</span> <span class="nf">market_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Nse.market_status"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.market_status">[docs]</a>    <span class="k">def</span> <span class="nf">market_status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks whether the market is open or not</span>
+<span class="sd">        :returns: bool variable indicating status of market. True -&gt; Open, False -&gt; Closed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_market_open</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_market_open</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Get a random quote to set the market status</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_quote</span><span class="p">(</span><span class="s1">&#39;infy&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_market_open</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_market_open</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 <div class="viewcode-block" id="Nse.get_peer_companies"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.get_peer_companies">[docs]</a>    <span class="k">def</span> <span class="nf">get_peer_companies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: a list of peer companies</span>
@@ -194,7 +197,34 @@
 
             <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="Nse.get_top_gainers"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.get_top_gainers">[docs]</a>    <span class="k">def</span> <span class="nf">get_top_gainers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Nse.get_top"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.get_top">[docs]</a>    <span class="k">def</span> <span class="nf">get_top</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">options</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the top list of the argument specified.</span>
+
+<span class="sd">        :Parameters:</span>
+<span class="sd">        as_json: bool</span>
+<span class="sd">            Whether to return a json like string, or dict.</span>
+<span class="sd">        option: string</span>
+<span class="sd">            What to get top of. Possible values: gainers, losers, volume, active, advances decline, index list</span>
+
+<span class="sd">        :Returns: generator that can be used to iterate over the data requested</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">possible_options</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;GAINERS&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_top_gainers__</span><span class="p">,</span>
+            <span class="s1">&#39;LOSERS&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_top_losers__</span><span class="p">,</span>
+            <span class="s1">&#39;VOLUME&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_top_volume__</span><span class="p">,</span>
+            <span class="s1">&#39;ACTIVE&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_most_active__</span><span class="p">,</span>
+            <span class="s1">&#39;ADVANCES DECLINE&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_advances_declines__</span><span class="p">,</span>
+            <span class="s1">&#39;INDEX LIST&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_index_list__</span>
+            <span class="p">}</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="n">function_to_call</span> <span class="o">=</span> <span class="n">possible_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">function_to_call</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">function_to_call</span><span class="p">(</span><span class="n">as_json</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__get_top_gainers__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: a list of dictionaries containing top gainers of the day</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -207,9 +237,9 @@
         <span class="c1"># clean the output and make appropriate type conversions</span>
         <span class="n">res_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_server_response</span><span class="p">(</span>
             <span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">res_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">res_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Nse.get_top_losers"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.get_top_losers">[docs]</a>    <span class="k">def</span> <span class="nf">get_top_losers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_top_losers__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: a list of dictionaries containing top losers of the day</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -223,9 +253,9 @@
         <span class="c1"># clean the output and make appropriate type conversions</span>
         <span class="n">res_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_server_response</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">res_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">res_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Nse.get_top_volume"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.get_top_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_top_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_top_volume__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: a lis of dictionaries containing top volume gainers of the day</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -238,9 +268,9 @@
         <span class="c1"># clean the output and make appropriate type conversions</span>
         <span class="n">res_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_server_response</span><span class="p">(</span>
             <span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">res_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">res_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Nse.get_most_active"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.get_most_active">[docs]</a>    <span class="k">def</span> <span class="nf">get_most_active</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_most_active__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: a lis of dictionaries containing most active equites of the day</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -253,9 +283,9 @@
         <span class="c1"># clean the output and make appropriate type conversions</span>
         <span class="n">res_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_server_response</span><span class="p">(</span>
             <span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">res_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">res_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Nse.get_advances_declines"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.get_advances_declines">[docs]</a>    <span class="k">def</span> <span class="nf">get_advances_declines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_advances_declines__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :return: a list of dictionaries with advance decline data</span>
 <span class="sd">        :raises: URLError, HTTPError</span>
@@ -269,9 +299,9 @@
         <span class="n">resp_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
         <span class="n">resp_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_server_response</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
                      <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">resp_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">resp_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">resp_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Nse.get_index_list"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.get_index_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_index_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_index_list__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        get list of indices and codes</span>
 <span class="sd">        params: as_json: True | False</span>
@@ -284,13 +314,13 @@
         <span class="n">resp</span> <span class="o">=</span> <span class="n">byte_adaptor</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
         <span class="n">resp_list</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">resp</span><span class="p">)[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
         <span class="n">index_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">resp_list</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">index_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_response</span><span class="p">(</span><span class="n">index_list</span><span class="p">,</span> <span class="n">as_json</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Nse.is_valid_index"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.is_valid_index">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        returns: True | Flase , based on whether code is valid</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">index_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_index_list</span><span class="p">()</span>
+        <span class="n">index_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_index_list__</span><span class="p">()</span>
         <span class="k">return</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">code</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">index_list</span> <span class="k">else</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="Nse.get_index_quote"><a class="viewcode-back" href="../../code.html#nsetools.nse.Nse.get_index_quote">[docs]</a>    <span class="k">def</span> <span class="nf">get_index_quote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">as_json</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>

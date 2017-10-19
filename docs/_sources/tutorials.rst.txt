@@ -1,2 +1,8 @@
 Tutorials
 ==========
+Example ::
+
+    print('Hi there')
+    # This is supposed to be a comment
+
+Thats how you do it

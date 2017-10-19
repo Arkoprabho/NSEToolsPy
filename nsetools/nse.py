@@ -160,15 +160,15 @@ class Nse():
     def get_top(self, *options, as_json=False):
         """
         Gets the top list of the argument specified.
-        Parameters
-        ----------
+
+        :Parameters:
         as_json: bool
-            Whether to return a json like string, or dict
+            Whether to return a json like string, or dict.
         option: string
             What to get top of. Possible values: gainers, losers, volume, active, advances decline, index list
-        Returns
-        -------
-        A generator that can be used to iterate over the data requested
+
+        :Returns: generator that can be used to iterate over the data requested
+
         """
         possible_options = {
             'GAINERS': self.__get_top_gainers__,

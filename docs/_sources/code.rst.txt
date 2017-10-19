@@ -4,5 +4,3 @@ Auto Generated Code Docs
     :members:
 .. automodule:: nsetools.utils
     :members:
-.. automodule:: nsetools.bases
-    :members:
