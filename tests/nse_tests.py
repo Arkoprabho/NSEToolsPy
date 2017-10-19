@@ -6,7 +6,6 @@ import logging
 import json
 import re
 import six
-from nsetools.bases import AbstractBaseExchange
 from nsetools import Nse
 from nsetools.utils import js_adaptor, byte_adaptor
 
@@ -20,11 +19,6 @@ class TestCoreAPIs(unittest.TestCase):
     def test_string_representation(self):
         self.assertEqual(str(self.nse) ,
                          "Driver Class for National Stock Exchange (NSE)")
-
-    def test_instantiate_abs_class(self):
-        class Exchange(AbstractBaseExchange): pass
-        with self.assertRaises(TypeError):
-            exc = Exchange()
 
     def test_nse_headers(self):
         ret = self.nse.nse_headers()
@@ -127,33 +121,55 @@ class TestCoreAPIs(unittest.TestCase):
         wrong_code = 'in'
         self.assertFalse(self.nse.is_valid_code(wrong_code))
 
-    def test_get_top_gainers(self):
-        res = self.nse.get_top_gainers()
-        self.assertIsInstance(res, list)
-        # test json response
-        res = self.nse.get_top_gainers(as_json=True)
-        self.assertIsInstance(res, str)
+    def test_get_top(self):
+        # as_json = False
+        # This test will remove the need to test the individual parts
+        result = self.nse.get_top('gainers', 'losers', 'volume', 'active', 'advances decline', 'index list', 'JUNK')
+        # Gainers/Losers/Volume/Advances Decline is supposed to return a list of dictionaries
+        # Index list is supposed to return a list of strings
+        # JUNK Should not return anything
+        temp = []
+        for item in result:
+            temp.append(item)
 
-    def test_get_top_losers(self):
-        res = self.nse.get_top_losers()
-        self.assertIsInstance(res, list)
+        self.assertEqual(6, len(temp))
+        gainer, loser, volume, active, adv_decline, index_list = temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]
+        
+        # Test these individually
+        self.assertIsInstance(gainer, list)
+        self.assertIsInstance(gainer[0], dict)
 
-        res = self.nse.get_top_losers(as_json=True)
-        self.assertIsInstance(res, str)
+        self.assertIsInstance(loser, list)
+        self.assertIsInstance(loser[0], dict)
 
-    def test_get_top_volume(self):
-        res = self.nse.get_top_volume()
-        self.assertIsInstance(res, list)
+        self.assertIsInstance(volume, list)
+        self.assertIsInstance(volume[0], dict)
 
-        res = self.nse.get_top_volume(as_json=True)
-        self.assertIsInstance(res, str)
+        self.assertIsInstance(adv_decline, list)
+        self.assertIsInstance(adv_decline[0], dict)
 
-    def test_get_most_active(self):
-        res = self.nse.get_most_active()
-        self.assertIsInstance(res, list)
+        self.assertIsInstance(index_list, list)
 
-        res = self.nse.get_most_active(as_json=True)
-        self.assertIsInstance(res, str)
+        # Now as_json = True
+        result = self.nse.get_top('gainers', 'losers', 'volume', 'active', 'advances decline', 'index list', as_json=True)
+
+        temp = []
+        for item in result:
+            temp.append(item)
+
+        self.assertEqual(6, len(temp))
+        gainer, loser, volume, active, adv_decline_json, index_list_json = temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]
+
+        self.assertIsInstance(gainer, str)
+        self.assertIsInstance(loser, str)
+        self.assertIsInstance(volume, str)
+        self.assertIsInstance(active, str)
+
+        self.assertIsInstance(adv_decline_json, str)
+        self.assertEqual(len(adv_decline), len(json.loads(adv_decline_json)))
+
+        self.assertIsInstance(index_list_json, str)
+        self.assertListEqual(index_list, json.loads(index_list_json))
 
     def test_render_response(self):
         d = {'fname':'Arkoprabho', 'lname':'Chakraborti'}
@@ -165,17 +181,6 @@ class TestCoreAPIs(unittest.TestCase):
         self.assertIsInstance(resp_json, str)
         # and on reconstruction it should become same as original dict
         self.assertDictEqual(d, json.loads(resp_json))
-
-    def test_advances_declines(self):
-        resp = self.nse.get_advances_declines()
-        # it should be a list of dictionaries
-        self.assertIsInstance(resp, list)
-        # get the json version
-        resp_json = self.nse.get_advances_declines(as_json=True)
-        self.assertIsInstance(resp_json, str)
-        # load the json response and it should have same number of
-        # elements as in case of first response
-        self.assertEqual(len(resp), len(json.loads(resp_json)))
 
     def test_is_valid_index(self):
         code = 'NIFTY BANK'
@@ -200,15 +205,6 @@ class TestCoreAPIs(unittest.TestCase):
         # with lower case code
         code = 'nifty bank'
         self.assertIsInstance(self.nse.get_index_quote(code), dict)
-
-    def test_get_index_list(self):
-        index_list = self.nse.get_index_list()
-        index_list_json = self.nse.get_index_list(as_json=True)
-        self.assertIsInstance(index_list, list)
-        # test json response type
-        self.assertIsInstance(index_list_json, str)
-        # reconstruct list from json and match
-        self.assertListEqual(index_list, json.loads(index_list_json))
 
     def test_jsadptor(self):
         buffer = 'abc:true, def:false, ghi:NaN, jkl:none'
