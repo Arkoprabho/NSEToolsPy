@@ -1,0 +1,8 @@
+Auto Generated Code Docs
+========================
+.. automodule:: nsetools.nse
+    :members:
+.. automodule:: nsetools.utils
+    :members:
+.. automodule:: nsetools.bases
+    :members:
