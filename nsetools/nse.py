@@ -9,8 +9,11 @@ from urllib.request import build_opener, HTTPCookieProcessor, Request
 from urllib.parse import urlencode
 from http.cookiejar import CookieJar
 
+import pandas as pd
+
 from nsetools.utils import byte_adaptor
 from nsetools.utils import js_adaptor
+from nsetools.net_utils import read_url
 
 
 class Nse():
@@ -36,31 +39,43 @@ class Nse():
         # None indicates that the default value is stored and we havent checked for it.
         self.is_market_open = (False, None)
 
-    def get_stock_codes(self, cached=True, as_json=False):
+    def get_stock_codes(self, cached=True):
         """
-        returns a dictionary with key as stock code and value as stock name.
-        It also implements cache functionality and hits the server only
-        if user insists or cache is empty
-        :return: dict
+        Retreives the equity list from NSE, and stores it in a dataframe.
+        
+        :Parameters:
+        cached: bool
+            Whether to cache the data or not. Prefer keeping this true unless you are running into OOM issues.
+        as_json = 
+        :return: pandas DataFrame
         """
+
         url = self.stocks_csv_url
-        req = Request(url, None, self.headers)
-        res_dict = {}
+        res = read_url(url, self.headers)
+        column_dict = {
+            0: 'Symbol',
+            1: 'Name',
+            2: 'Series',
+            3: 'Date of Listing',
+            4: 'Paid up Value',
+            5: 'Market Lot',
+            6: 'ISIN Number',
+            7: 'Face Value'
+            }
+        res_dataframe = pd.DataFrame()
         if cached is not True or self.__CODECACHE__ is None:
-            # raises HTTPError and URLError
-            res = self.opener.open(req)
-            if res is not None:
-                # string file like object
-                res = byte_adaptor(res)
-                for line in res.read().split('\n'):
-                    if line != '' and re.search(',', line):
-                        (code, name) = line.split(',')[0:2]
-                        res_dict[code] = name
-                    # else just skip the evaluation, line may not be a valid csv
-            else:
-                raise Exception('no response received')
-            self.__CODECACHE__ = res_dict
-        return self.render_response(self.__CODECACHE__, as_json)
+            for i, line in enumerate(res.read().split('\n')):
+                if i == 0:
+                    # This contains the column names
+                    pass
+                elif line != '' and re.search(',', line):
+                    split_line = line.split(',')
+                    for index, items in enumerate(split_line):
+                        res_dataframe.set_value(i, column_dict[index], items)
+
+                # else just skip the evaluation, line may not be a valid csv
+            self.__CODECACHE__ = res_dataframe
+        return self.render_response(self.__CODECACHE__)
 
     def is_valid_code(self, code):
         """

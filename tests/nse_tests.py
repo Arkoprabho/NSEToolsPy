@@ -1,6 +1,7 @@
 """
     This is a test module for testing abstract base class
 """
+import pandas as pd
 import unittest
 import logging
 import json
@@ -85,12 +86,7 @@ class TestCoreAPIs(unittest.TestCase):
     def test_get_stock_codes(self):
         sc = self.nse.get_stock_codes()
         self.assertIsNotNone(sc)
-        self.assertIsInstance(sc, dict)
-        # test the json format return
-        sc_json = self.nse.get_stock_codes(as_json=True)
-        self.assertIsInstance(sc_json, str)
-        # reconstruct the dict from json and compare
-        six.assertCountEqual(self, sc, json.loads(sc_json))
+        self.assertIsInstance(sc, pd.DataFrame)
 
 # TODO: use mock and create one test where response contains a blank line
 # TODO: use mock and create one test where response doesnt contain a csv
