@@ -9,12 +9,11 @@ from urllib.request import build_opener, HTTPCookieProcessor, Request
 from urllib.parse import urlencode
 from http.cookiejar import CookieJar
 
-from nsetools.bases import AbstractBaseExchange
 from nsetools.utils import byte_adaptor
 from nsetools.utils import js_adaptor
 
 
-class Nse(AbstractBaseExchange):
+class Nse():
     """
     class which implements all the functionality for
     National Stock Exchange
@@ -114,6 +113,10 @@ class Nse(AbstractBaseExchange):
             return None
 
     def market_status(self):
+        """
+        Checks whether the market is open or not
+        :returns: bool variable indicating status of market. True -> Open, False -> Closed
+        """
         if self.is_market_open[1] is not None:
             return self.is_market_open[0]
         else:
@@ -153,7 +156,34 @@ class Nse(AbstractBaseExchange):
 
             return data
 
-    def get_top_gainers(self, as_json=False):
+
+    def get_top(self, *options, as_json=False):
+        """
+        Gets the top list of the argument specified.
+        Parameters
+        ----------
+        as_json: bool
+            Whether to return a json like string, or dict
+        option: string
+            What to get top of. Possible values: gainers, losers, volume, active, advances decline, index list
+        Returns
+        -------
+        A generator that can be used to iterate over the data requested
+        """
+        possible_options = {
+            'GAINERS': self.__get_top_gainers__,
+            'LOSERS': self.__get_top_losers__,
+            'VOLUME': self.__get_top_volume__,
+            'ACTIVE': self.__get_most_active__,
+            'ADVANCES DECLINE': self.__get_advances_declines__,
+            'INDEX LIST': self.__get_index_list__
+            }
+        for item in options:
+            function_to_call = possible_options.get(item.upper())
+            if function_to_call is not None:
+                yield function_to_call(as_json)
+
+    def __get_top_gainers__(self, as_json=False):
         """
         :return: a list of dictionaries containing top gainers of the day
         """
@@ -168,7 +198,7 @@ class Nse(AbstractBaseExchange):
             item) for item in res_dict['data']]
         return self.render_response(res_list, as_json)
 
-    def get_top_losers(self, as_json=False):
+    def __get_top_losers__(self, as_json=False):
         """
         :return: a list of dictionaries containing top losers of the day
         """
@@ -184,7 +214,7 @@ class Nse(AbstractBaseExchange):
                     for item in res_dict['data']]
         return self.render_response(res_list, as_json)
 
-    def get_top_volume(self, as_json=False):
+    def __get_top_volume__(self, as_json=False):
         """
         :return: a lis of dictionaries containing top volume gainers of the day
         """
@@ -199,7 +229,7 @@ class Nse(AbstractBaseExchange):
             item) for item in res_dict['data']]
         return self.render_response(res_list, as_json)
 
-    def get_most_active(self, as_json=False):
+    def __get_most_active__(self, as_json=False):
         """
         :return: a lis of dictionaries containing most active equites of the day
         """
@@ -214,7 +244,7 @@ class Nse(AbstractBaseExchange):
             item) for item in res_dict['data']]
         return self.render_response(res_list, as_json)
 
-    def get_advances_declines(self, as_json=False):
+    def __get_advances_declines__(self, as_json=False):
         """
         :return: a list of dictionaries with advance decline data
         :raises: URLError, HTTPError
@@ -230,7 +260,7 @@ class Nse(AbstractBaseExchange):
                      for item in resp_dict['data']]
         return self.render_response(resp_list, as_json)
 
-    def get_index_list(self, as_json=False):
+    def __get_index_list__(self, as_json=False):
         """
         get list of indices and codes
         params: as_json: True | False
@@ -249,7 +279,7 @@ class Nse(AbstractBaseExchange):
         """
         returns: True | Flase , based on whether code is valid
         """
-        index_list = self.get_index_list()
+        index_list = self.__get_index_list__()
         return True if code.upper() in index_list else False
 
     def get_index_quote(self, code, as_json=False):
