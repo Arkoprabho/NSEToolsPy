@@ -11,7 +11,6 @@ from http.cookiejar import CookieJar
 
 import pandas as pd
 
-from nsetools.utils import byte_adaptor
 from nsetools.utils import js_adaptor
 from nsetools.net_utils import read_url
 
@@ -75,16 +74,17 @@ class Nse():
 
                 # else just skip the evaluation, line may not be a valid csv
             self.__CODECACHE__ = res_dataframe
-        return self.render_response(self.__CODECACHE__)
+        return self.__CODECACHE__
 
     def is_valid_code(self, code):
         """
         :param code: a string stock code
-        :return: Boolean
+        :return: bool
         """
         if code:
             stock_codes = self.get_stock_codes()
-            if code.upper() in stock_codes.keys():
+            search_result = stock_codes[stock_codes['Symbol'] == code.upper()]
+            if not search_result.empty:
                 return True
             return False
 
@@ -98,12 +98,7 @@ class Nse():
         code = code.upper()
         if self.is_valid_code(code):
             url = self.build_url_for_quote(code)
-            req = Request(url, None, self.headers)
-            # this can raise HTTPError and URLError, but we are not handling it
-            # north bound APIs should use it for exception handling
-            res = self.opener.open(req)
-
-            res = byte_adaptor(res)
+            res = read_url(url, self.headers)
 
             # Now parse the response to get the relevant data
             match = re.search(
@@ -140,15 +135,17 @@ class Nse():
         return self.is_market_open[0]
     def get_peer_companies(self, code, as_json=False):
         """
+        :Parameters:
+        code: str
+            The code of the company to find peers of
+        as_json: bool
+            Whether to render the response as json
         :returns: a list of peer companies
         """
         code = code.upper()
         if self.is_valid_code(code):
             url = self.peer_companies_url + code
-            req = Request(url, None, self.headers)
-            res = self.opener.open(req)
-
-            res = byte_adaptor(res)
+            res = read_url(url, self.headers)
 
             # We need to filter the data from this. The data is at an offset of 39 from the beginning and 8 at the end
             res = res.read()[39:-8]
@@ -203,10 +200,7 @@ class Nse():
         :return: a list of dictionaries containing top gainers of the day
         """
         url = self.top_gainer_url
-        req = Request(url, None, self.headers)
-        # this can raise HTTPError and URLError
-        res = self.opener.open(req)
-        res = byte_adaptor(res)
+        res = read_url(url, self.headers)
         res_dict = json.load(res)
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(
@@ -218,11 +212,7 @@ class Nse():
         :return: a list of dictionaries containing top losers of the day
         """
         url = self.top_loser_url
-        req = Request(url, None, self.headers)
-        # this can raise HTTPError and URLError
-        res = self.opener.open(req)
-        # string file like object
-        res = byte_adaptor(res)
+        res = read_url(url, self.headers)
         res_dict = json.load(res)
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(item)
@@ -234,10 +224,7 @@ class Nse():
         :return: a lis of dictionaries containing top volume gainers of the day
         """
         url = self.top_volume_url
-        req = Request(url, None, self.headers)
-        # this can raise HTTPError and URLError
-        res = self.opener.open(req)
-        res = byte_adaptor(res)
+        res = read_url(url, self.headers)
         res_dict = json.load(res)
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(
@@ -249,10 +236,7 @@ class Nse():
         :return: a lis of dictionaries containing most active equites of the day
         """
         url = self.most_active_url
-        req = Request(url, None, self.headers)
-        # this can raise HTTPError and URLError
-        res = self.opener.open(req)
-        res = byte_adaptor(res)
+        res = read_url(url, self.headers)
         res_dict = json.load(res)
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(
@@ -265,11 +249,7 @@ class Nse():
         :raises: URLError, HTTPError
         """
         url = self.advances_declines_url
-        req = Request(url, None, self.headers)
-        # raises URLError or HTTPError
-        resp = self.opener.open(req)
-        # string file like object
-        resp = byte_adaptor(resp)
+        resp = read_url(url, self.headers)
         resp_dict = json.load(resp)
         resp_list = [self.clean_server_response(item)
                      for item in resp_dict['data']]
@@ -282,10 +262,7 @@ class Nse():
         returns: a list | json of index codes
         """
         url = self.index_url
-        req = Request(url, None, self.headers)
-        # raises URLError or HTTPError
-        resp = self.opener.open(req)
-        resp = byte_adaptor(resp)
+        resp = read_url(url, self.headers)
         resp_list = json.load(resp)['data']
         index_list = [str(item['name']) for item in resp_list]
         return self.render_response(index_list, as_json)
@@ -307,10 +284,7 @@ class Nse():
         """
         url = self.index_url
         if self.is_valid_index(code):
-            req = Request(url, None, self.headers)
-            # raises HTTPError and URLError
-            resp = self.opener.open(req)
-            resp = byte_adaptor(resp)
+            resp = read_url(url, self.headers)
             resp_list = json.load(resp)['data']
             # this is list of dictionaries
             resp_list = [self.clean_server_response(item)
