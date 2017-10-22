@@ -43,8 +43,7 @@ class TestCoreAPIs(unittest.TestCase):
     def test_get_peer_companies(self):
         code = 'infy'
         response = self.nse.get_peer_companies(code)
-        self.assertIsInstance(response, list)
-        self.assertIsInstance(response[0], dict)
+        self.assertIsInstance(response, pd.DataFrame)
 
     def test_market_status(self):
         result = self.nse.market_status()

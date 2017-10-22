@@ -154,7 +154,7 @@ class Nse():
             # We will iteratively filter each company and append them to a list
             # HACK: the solution is very messy. Would be nice if a better cleaner solution can be found.
             start = 0
-            data = []
+            data = pd.DataFrame()
             for item in re.finditer(r'({*})', res):
                 # The second item. We want the curly brace for json parsing
                 end = item.span()[1]
@@ -163,7 +163,7 @@ class Nse():
                 company_info = json.loads(string)
                 # We dont care about this. Throw it out
                 del(company_info['industry'])
-                data.append(company_info)
+                data = data.append(company_info, ignore_index=True)
                 start = end + 1
 
             return data
@@ -368,6 +368,8 @@ class Nse():
         """
         return 'Driver Class for National Stock Exchange (NSE)'
 
-# TODO: Use pandas dataframes
+# TODO: Cache using file handling. Add option in each method call to use files as cache.
+# This will act as a more reliable cache. Also, we can cache market data if the market is closed.
+# TODO: get quotes for a series of codes rather than just one.
 # TODO: concept of portfolio for fetching price in a batch and field which should be captured
 # TODO: Concept of session, just like as in sqlalchemy
