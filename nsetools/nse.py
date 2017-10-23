@@ -88,39 +88,45 @@ class Nse():
                 return True
             return False
 
-    def get_quote(self, code, as_json=False):
+    def get_quote(self, *codes, **kwargs):
         """
         gets the quote for a given stock code
-        :param code:
+        :param codes: 
         :return: dict or None
         :raises: HTTPError, URLError
         """
-        code = code.upper()
-        if self.is_valid_code(code):
-            url = self.build_url_for_quote(code)
-            res = read_url(url, self.headers)
+        quotes = []
+        as_json = False if kwargs.get('as_json') is None else kwargs.get('as_json')
+        for code in codes:
+            code = code.upper()
+            if self.is_valid_code(code):
+                url = self.build_url_for_quote(code)
+                res = read_url(url, self.headers)
 
-            # Now parse the response to get the relevant data
-            match = re.search(
-                r'\{<div\s+id="responseDiv"\s+style="display:none">\s+(\{.*?\{.*?\}.*?\})',
-                res.read(), re.S
-            )
-            # ast can raise SyntaxError, let's catch only this error
-            try:
-                buffer = match.group(1)
-                buffer = js_adaptor(buffer)
-                response = self.clean_server_response(
-                    ast.literal_eval(buffer)['data'][0])
-            except SyntaxError as err:
-                raise Exception('ill formatted response')
-            else:
-                rendered_response = self.render_response(response, as_json)
-                # Check if the market is open (to avoid repeated network computation)
-                if not as_json and rendered_response['closePrice'] != 0.0:
-                    self.is_market_open = (False, 1)
-                return rendered_response
-        else:
-            return None
+                # Now parse the response to get the relevant data
+                match = re.search(
+                    r'\{<div\s+id="responseDiv"\s+style="display:none">\s+(\{.*?\{.*?\}.*?\})',
+                    res.read(), re.S
+                )
+                # ast can raise SyntaxError, let's catch only this error
+                try:
+                    buffer = match.group(1)
+                    buffer = js_adaptor(buffer)
+                    response = self.clean_server_response(
+                        ast.literal_eval(buffer)['data'][0])
+                except SyntaxError as err:
+                    raise Exception('ill formatted response')
+                else:
+                    rendered_response = self.render_response(response, as_json)
+                    # Check if the market is open (to avoid repeated network computation)
+
+                    if as_json:
+                        if json.loads(rendered_response)['closePrice'] == 0:
+                            self.is_market_open = (True, 1)
+                    elif rendered_response['closePrice'] == 0.0:
+                        self.is_market_open = (True, 1)
+                    quotes.append(rendered_response)
+        return quotes
 
     def market_status(self):
         """
@@ -371,5 +377,7 @@ class Nse():
 # TODO: Cache using file handling. Add option in each method call to use files as cache.
 # This will act as a more reliable cache. Also, we can cache market data if the market is closed.
 # TODO: get quotes for a series of codes rather than just one.
+# This is IO bound, lets find a way to optimize this, so that mutliple requests can be made at the same time.
+# CHECK: Whether this works in Linux. Last i checked it wasnt passing all the tests
 # TODO: concept of portfolio for fetching price in a batch and field which should be captured
 # TODO: Concept of session, just like as in sqlalchemy

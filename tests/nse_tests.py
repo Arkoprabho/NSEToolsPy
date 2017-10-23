@@ -97,16 +97,16 @@ class TestCoreAPIs(unittest.TestCase):
         self.assertIsNone(self.nse.get_quote(wrong_code))
 
     def test_get_quote(self):
-        code = 'infy'
-        resp = self.nse.get_quote(code)
-        self.assertIsInstance(resp, dict)
+        resp = self.nse.get_quote('infy', '20Microns', 'abb')
+        self.assertIsInstance(resp, list)
+        self.assertIsInstance(resp[0], dict)
         # test json response
-        json_resp = self.nse.get_quote(code, as_json=True)
-        self.assertIsInstance(json_resp, str)
+        json_resp = self.nse.get_quote('infy', '20Microns', 'abb', as_json=True)
+        self.assertIsInstance(json_resp[0], str)
         # reconstruct the original dict from json
         # this test may raise false alarms in case the
         # the price changed in that very moment.
-        self.assertDictEqual(resp, json.loads(json_resp))
+        self.assertDictEqual(resp[0], json.loads(json_resp[0]))
 
     def test_is_valid_code(self):
         code = 'infy'
