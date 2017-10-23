@@ -88,15 +88,14 @@ class Nse():
                 return True
             return False
 
-    def get_quote(self, *codes, **kwargs):
+    def get_quote(self, *codes, as_json=False):
         """
         gets the quote for a given stock code
         :param codes: 
-        :return: dict or None
+        :return: list of dicts with quotes of all companies codes passed.
         :raises: HTTPError, URLError
         """
         quotes = []
-        as_json = False if kwargs.get('as_json') is None else kwargs.get('as_json')
         for code in codes:
             code = code.upper()
             if self.is_valid_code(code):
