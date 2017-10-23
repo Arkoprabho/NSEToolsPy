@@ -94,14 +94,16 @@ class TestCoreAPIs(unittest.TestCase):
 
     def test_negative_get_quote(self):
         wrong_code = 'inf'
-        self.assertIsNone(self.nse.get_quote(wrong_code))
+        self.assertListEqual(self.nse.get_quote(wrong_code), [])
 
     def test_get_quote(self):
         resp = self.nse.get_quote('infy', '20Microns', 'abb')
+        self.assertEqual(len(resp), 3)
         self.assertIsInstance(resp, list)
         self.assertIsInstance(resp[0], dict)
         # test json response
         json_resp = self.nse.get_quote('infy', '20Microns', 'abb', as_json=True)
+        self.assertEqual(len(json_resp), 3)
         self.assertIsInstance(json_resp[0], str)
         # reconstruct the original dict from json
         # this test may raise false alarms in case the
