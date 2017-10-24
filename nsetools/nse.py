@@ -4,14 +4,16 @@ Contains the core APIs
 import ast
 import re
 import json
+import os
 
 from urllib.request import build_opener, HTTPCookieProcessor, Request
 from urllib.parse import urlencode
 from http.cookiejar import CookieJar
+from tempfile import gettempdir
 
 import pandas as pd
 
-from nsetools.utils import js_adaptor
+from nsetools.utils import js_adaptor, save_file
 from nsetools.net_utils import read_url
 
 
@@ -21,8 +23,14 @@ class Nse():
     National Stock Exchange
     """
     __CODECACHE__ = None
+    __file_caching__ = True
 
-    def __init__(self):
+    def __init__(self, file_caching=True):
+        """
+        Initializes a new instance of the Nse class.
+        :Parameters:
+            file_caching: (optional) bool variable to indicate whether to use files for caching of non changing data
+        """
         self.opener = self.nse_opener()
         self.headers = self.nse_headers()
         # URL list
@@ -35,8 +43,12 @@ class Nse():
         self.advances_declines_url = 'http://www.nseindia.com/common/json/indicesAdvanceDeclines.json'
         self.index_url = "http://www.nseindia.com/homepage/Indices1.json"
         self.peer_companies_url = 'https://nseindia.com/live_market/dynaContent/live_watch/get_quote/ajaxPeerCompanies.jsp?symbol='
+
+
         # None indicates that the default value is stored and we havent checked for it.
         self.is_market_open = (False, None)
+
+        self.__file_caching__ = file_caching
 
     def get_stock_codes(self, cached=True):
         """
@@ -48,10 +60,21 @@ class Nse():
         as_json = 
         :return: pandas DataFrame
         """
+        # Check if the file has already been cached
+        stock_code_file = os.path.join(gettempdir(), 'StockCodes.csv')
+        if os.path.exists(stock_code_file):
+            # Read from the file
+            self.__CODECACHE__ = pd.read_csv(stock_code_file)
+            return self.__CODECACHE__
+
         if self.__CODECACHE__ is not None and not self.__CODECACHE__.empty:
+            # Because the file could not be found, save it.
+            if self.__file_caching__:
+                save_file(self.__CODECACHE__, 'csv', path=gettempdir(), name='StockCodes')
             return self.__CODECACHE__
 
         def get_stock_code_dataframe():
+            res_dataframe = pd.DataFrame()
             url = self.stocks_csv_url
             res = read_url(url, self.headers)
             column_dict = {
@@ -76,12 +99,13 @@ class Nse():
                 # else just skip the evaluation, line may not be a valid csv
             return res_dataframe
 
-        res_dataframe = pd.DataFrame()
-        if cached is False:
-            return get_stock_code_dataframe()
-        else:
+        if cached:
             self.__CODECACHE__ = get_stock_code_dataframe()
+            if self.__file_caching__:
+                save_file(self.__CODECACHE__, 'csv', path=gettempdir(), name='StockCodes')
             return self.__CODECACHE__
+        return get_stock_code_dataframe()
+            
 
 
     def is_valid_code(self, code):

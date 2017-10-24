@@ -3,12 +3,14 @@
 """
 import pandas as pd
 import unittest
+import os
 import logging
 import json
 import re
 import six
 from nsetools import Nse
-from nsetools.utils import js_adaptor, byte_adaptor
+from nsetools.utils import js_adaptor, byte_adaptor, save_file
+from tempfile import gettempdir
 
 log = logging.getLogger('nse')
 logging.basicConfig(level=logging.DEBUG)
@@ -217,6 +219,29 @@ class TestCoreAPIs(unittest.TestCase):
         fbuffer = BytesIO(buffer)
         ret_file_buffer = byte_adaptor(fbuffer)
         self.assertIsInstance(ret_file_buffer, six.StringIO)
+
+    def test_save_file(self):
+        # Call the function, check if the file has been saved at the required location
+        dataframe = self.nse.get_stock_codes()
+        save_file(dataframe, 'csv', path=gettempdir(), name='StockCodes')
+        path = os.path.join(gettempdir(), 'StockCodes.csv')
+        if not os.path.exists(path):
+            self.fail()
+
+        save_file(dataframe, 'html', path=gettempdir(), name='StockCodes')
+        path = os.path.join(gettempdir(), 'StockCodes.html')
+        if not os.path.exists(path):
+            self.fail()
+
+        save_file(dataframe, 'json', path=gettempdir(), name='StockCodes')
+        path = os.path.join(gettempdir(), 'StockCodes.json')
+        if not os.path.exists(path):
+            self.fail()
+
+        save_file(dataframe, 'tex', path=gettempdir(), name='StockCodes')
+        path = os.path.join(gettempdir(), 'StockCodes.tex')
+        if not os.path.exists(path):
+            self.fail()
 
 if __name__ == '__main__':
     unittest.main()
