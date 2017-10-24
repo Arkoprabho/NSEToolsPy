@@ -86,6 +86,8 @@ class TestCoreAPIs(unittest.TestCase):
         sc = self.nse.get_stock_codes()
         self.assertIsNotNone(sc)
         self.assertIsInstance(sc, pd.DataFrame)
+        if sc.empty:
+            self.fail()
 
 # TODO: use mock and create one test where response contains a blank line
 # TODO: use mock and create one test where response doesnt contain a csv
