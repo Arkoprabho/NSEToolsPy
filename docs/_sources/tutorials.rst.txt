@@ -1,8 +1,12 @@
 Tutorials
 ==========
-Example ::
+Instantiation ::
 
-    print('Hi there')
-    # This is supposed to be a comment
+    from nsetools import Nse
+    nse = Nse()
 
-Thats how you do it
+    # To request a stock quote, pass the symbol
+    infosys_quote = nse.get_quote('infy')
+
+    # You can request several quotes at the same time
+    quote_list = nse.get_quote('infy', 'abb', 'acc')

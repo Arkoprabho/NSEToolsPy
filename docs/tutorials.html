@@ -42,12 +42,17 @@
             
   <div class="section" id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
-<p>Example</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Hi there&#39;</span><span class="p">)</span>
-<span class="c1"># This is supposed to be a comment</span>
+<p>Instantiation</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">nsetools</span> <span class="k">import</span> <span class="n">Nse</span>
+<span class="n">nse</span> <span class="o">=</span> <span class="n">Nse</span><span class="p">()</span>
+
+<span class="c1"># To request a stock quote, pass the symbol</span>
+<span class="n">infosys_quote</span> <span class="o">=</span> <span class="n">nse</span><span class="o">.</span><span class="n">get_quote</span><span class="p">(</span><span class="s1">&#39;infy&#39;</span><span class="p">)</span>
+
+<span class="c1"># You can request several quotes at the same time</span>
+<span class="n">quote_list</span> <span class="o">=</span> <span class="n">nse</span><span class="o">.</span><span class="n">get_quote</span><span class="p">(</span><span class="s1">&#39;infy&#39;</span><span class="p">,</span> <span class="s1">&#39;abb&#39;</span><span class="p">,</span> <span class="s1">&#39;acc&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Thats how you do it</p>
 </div>
 
 
