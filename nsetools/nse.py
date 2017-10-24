@@ -48,21 +48,22 @@ class Nse():
         as_json = 
         :return: pandas DataFrame
         """
+        if self.__CODECACHE__ is not None and not self.__CODECACHE__.empty:
+            return self.__CODECACHE__
 
-        url = self.stocks_csv_url
-        res = read_url(url, self.headers)
-        column_dict = {
-            0: 'Symbol',
-            1: 'Name',
-            2: 'Series',
-            3: 'Date of Listing',
-            4: 'Paid up Value',
-            5: 'Market Lot',
-            6: 'ISIN Number',
-            7: 'Face Value'
-            }
-        res_dataframe = pd.DataFrame()
-        if cached is not True or self.__CODECACHE__ is None:
+        def get_stock_code_dataframe():
+            url = self.stocks_csv_url
+            res = read_url(url, self.headers)
+            column_dict = {
+                0: 'Symbol',
+                1: 'Name',
+                2: 'Series',
+                3: 'Date of Listing',
+                4: 'Paid up Value',
+                5: 'Market Lot',
+                6: 'ISIN Number',
+                7: 'Face Value'
+                }
             for i, line in enumerate(res.read().split('\n')):
                 if i == 0:
                     # This contains the column names
@@ -73,8 +74,15 @@ class Nse():
                         res_dataframe.set_value(i, column_dict[index], items)
 
                 # else just skip the evaluation, line may not be a valid csv
-            self.__CODECACHE__ = res_dataframe
-        return self.__CODECACHE__
+            return res_dataframe
+
+        res_dataframe = pd.DataFrame()
+        if cached is False:
+            return get_stock_code_dataframe()
+        else:
+            self.__CODECACHE__ = get_stock_code_dataframe()
+            return self.__CODECACHE__
+
 
     def is_valid_code(self, code):
         """
@@ -124,6 +132,8 @@ class Nse():
                             self.is_market_open = (True, 1)
                     elif rendered_response['closePrice'] == 0.0:
                         self.is_market_open = (True, 1)
+                    else:
+                        self.is_market_open = (False, 1)
                     quotes.append(rendered_response)
         return quotes
 
