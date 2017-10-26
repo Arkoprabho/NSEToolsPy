@@ -1,10 +1,7 @@
 """
 Contains the core APIs
 """
-import ast
-import re
-import json
-import os
+import ast, re, json, os, sys, inspect
 
 from urllib.request import build_opener, HTTPCookieProcessor, Request
 from urllib.parse import urlencode
@@ -15,6 +12,7 @@ import pandas as pd
 
 from nsetools.utils import js_adaptor, save_file
 from nsetools.net_utils import read_url
+from nsetools.cache_handling import CacheHandler
 
 
 class Nse():
@@ -31,7 +29,6 @@ class Nse():
         :Parameters:
             file_caching: (optional) bool variable to indicate whether to use files for caching of non changing data
         """
-        self.opener = self.nse_opener()
         self.headers = self.nse_headers()
         # URL list
         self.get_quote_url = 'https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?'
@@ -61,7 +58,8 @@ class Nse():
         :return: pandas DataFrame
         """
         # Check if the file has already been cached
-        stock_code_file = os.path.join(gettempdir(), 'StockCodes.csv')
+        # This gives the name of the current function to pass ```inspect.stack()[0][3]```
+        stock_code_file = CacheHandler.get_cache_file(inspect.stack()[0][3])
         if os.path.exists(stock_code_file):
             # Read from the file
             self.__CODECACHE__ = pd.read_csv(stock_code_file)
@@ -70,7 +68,7 @@ class Nse():
         if self.__CODECACHE__ is not None and not self.__CODECACHE__.empty:
             # Because the file could not be found, save it.
             if self.__file_caching__:
-                save_file(self.__CODECACHE__, 'csv', path=gettempdir(), name='StockCodes')
+                save_file(self.__CODECACHE__, 'csv', path=CacheHandler.get_cache_directory(), name='stock_codes')
             return self.__CODECACHE__
 
         def get_stock_code_dataframe():
@@ -102,7 +100,7 @@ class Nse():
         if cached:
             self.__CODECACHE__ = get_stock_code_dataframe()
             if self.__file_caching__:
-                save_file(self.__CODECACHE__, 'csv', path=gettempdir(), name='StockCodes')
+                save_file(self.__CODECACHE__, 'csv', path=CacheHandler.get_cache_directory(), name='stock_codes')
             return self.__CODECACHE__
         return get_stock_code_dataframe()
             
@@ -187,6 +185,7 @@ class Nse():
             res = read_url(url, self.headers)
 
             # We need to filter the data from this. The data is at an offset of 39 from the beginning and 8 at the end
+            
             res = res.read()[39:-8]
 
             # Now comes the tricky batshit crazy part.
@@ -348,14 +347,6 @@ class Nse():
                 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0',
                 'X-Requested-With': 'XMLHttpRequest'
                 }
-
-    def nse_opener(self):
-        """
-        builds opener for urllib2
-        :return: opener object
-        """
-        cj = CookieJar()
-        return build_opener(HTTPCookieProcessor(cj))
 
     def build_url_for_quote(self, code):
         """

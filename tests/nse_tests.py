@@ -27,10 +27,6 @@ class TestCoreAPIs(unittest.TestCase):
         ret = self.nse.nse_headers()
         self.assertIsInstance(ret, dict)
 
-    def test_nse_opener(self):
-        ''' should not raise any exception '''
-        opener = self.nse.nse_opener()
-
     def test_build_url_for_quote(self):
         test_code = 'infy'
         url = self.nse.build_url_for_quote(test_code)
