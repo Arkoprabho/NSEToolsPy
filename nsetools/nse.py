@@ -135,7 +135,7 @@ class Nse():
                     else:
                         self.is_market_open = (False, 1)
                     quotes.append(rendered_response)
-        return pd.DataFrame(quotes)
+        return pd.DataFrame(quotes).set_index('companyName')
 
 
 
