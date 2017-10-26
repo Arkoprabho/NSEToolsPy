@@ -43,6 +43,11 @@ class TestCoreAPIs(unittest.TestCase):
         response = self.nse.get_peer_companies(code)
         self.assertIsInstance(response, pd.DataFrame)
 
+        # This one was causing a weird error. as the offset was different
+        code = '63moons'
+        response = self.nse.get_peer_companies(code)
+        self.assertIsInstance(response, pd.DataFrame)
+
     def test_market_status(self):
         result = self.nse.market_status()
         self.assertIsInstance(result, bool)
