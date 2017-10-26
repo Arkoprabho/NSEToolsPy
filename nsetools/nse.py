@@ -7,6 +7,7 @@ from urllib.request import build_opener, HTTPCookieProcessor, Request
 from urllib.parse import urlencode
 from http.cookiejar import CookieJar
 from tempfile import gettempdir
+from functools import lru_cache
 
 import pandas as pd
 
@@ -21,9 +22,9 @@ class Nse():
     National Stock Exchange
     """
     __CODECACHE__ = None
-    __file_caching__ = True
+    __cache_size__ = 64
 
-    def __init__(self, file_caching=True):
+    def __init__(self, cache_size=64):
         """
         Initializes a new instance of the Nse class.
         :Parameters:
@@ -45,8 +46,9 @@ class Nse():
         # None indicates that the default value is stored and we havent checked for it.
         self.is_market_open = (False, None)
 
-        self.__file_caching__ = file_caching
+        self.__cache_size__ = cache_size
 
+    @lru_cache(maxsize=__cache_size__)
     def get_stock_codes(self, cached=True):
         """
         Retreives the equity list from NSE, and stores it in a dataframe.
@@ -57,55 +59,33 @@ class Nse():
         as_json = 
         :return: pandas DataFrame
         """
-        # Check if the file has already been cached
-        # This gives the name of the current function to pass ```inspect.stack()[0][3]```
-        stock_code_file = CacheHandler.get_cache_file(inspect.stack()[0][3])
-        if os.path.exists(stock_code_file):
-            # Read from the file
-            self.__CODECACHE__ = pd.read_csv(stock_code_file)
-            return self.__CODECACHE__
+        res_dataframe = pd.DataFrame()
+        url = self.stocks_csv_url
+        res = read_url(url, self.headers)
+        column_dict = {
+            0: 'Symbol',
+            1: 'Name',
+            2: 'Series',
+            3: 'Date of Listing',
+            4: 'Paid up Value',
+            5: 'Market Lot',
+            6: 'ISIN Number',
+            7: 'Face Value'
+            }
+        for i, line in enumerate(res.read().split('\n')):
+            if i == 0:
+                # This contains the column names
+                pass
+            elif line != '' and re.search(',', line):
+                split_line = line.split(',')
+                for index, items in enumerate(split_line):
+                    res_dataframe.set_value(i, column_dict[index], items)
 
-        if self.__CODECACHE__ is not None and not self.__CODECACHE__.empty:
-            # Because the file could not be found, save it.
-            if self.__file_caching__:
-                save_file(self.__CODECACHE__, 'csv', path=CacheHandler.get_cache_directory(), name='stock_codes')
-            return self.__CODECACHE__
-
-        def get_stock_code_dataframe():
-            res_dataframe = pd.DataFrame()
-            url = self.stocks_csv_url
-            res = read_url(url, self.headers)
-            column_dict = {
-                0: 'Symbol',
-                1: 'Name',
-                2: 'Series',
-                3: 'Date of Listing',
-                4: 'Paid up Value',
-                5: 'Market Lot',
-                6: 'ISIN Number',
-                7: 'Face Value'
-                }
-            for i, line in enumerate(res.read().split('\n')):
-                if i == 0:
-                    # This contains the column names
-                    pass
-                elif line != '' and re.search(',', line):
-                    split_line = line.split(',')
-                    for index, items in enumerate(split_line):
-                        res_dataframe.set_value(i, column_dict[index], items)
-
-                # else just skip the evaluation, line may not be a valid csv
-            return res_dataframe
-
-        if cached:
-            self.__CODECACHE__ = get_stock_code_dataframe()
-            if self.__file_caching__:
-                save_file(self.__CODECACHE__, 'csv', path=CacheHandler.get_cache_directory(), name='stock_codes')
-            return self.__CODECACHE__
-        return get_stock_code_dataframe()
+            # else just skip the evaluation, line may not be a valid csv
+        return res_dataframe
             
 
-
+    @lru_cache(maxsize=__cache_size__)
     def is_valid_code(self, code):
         """
         :param code: a string stock code
@@ -170,6 +150,8 @@ class Nse():
             # Get a random quote to set the market status
             self.get_quote('infy')
         return self.is_market_open[0]
+
+    @lru_cache(maxsize=__cache_size__)
     def get_peer_companies(self, code, as_json=False):
         """
         :Parameters:
@@ -210,7 +192,7 @@ class Nse():
 
             return data
 
-
+    @lru_cache(maxsize=__cache_size__)
     def get_top(self, *options, as_json=False):
         """
         Gets the top list of the argument specified.
@@ -237,6 +219,7 @@ class Nse():
             if function_to_call is not None:
                 yield function_to_call(as_json)
 
+    @lru_cache(maxsize=__cache_size__)
     def __get_top_gainers__(self, as_json=False):
         """
         :return: a list of dictionaries containing top gainers of the day
@@ -249,6 +232,7 @@ class Nse():
             item) for item in res_dict['data']]
         return self.render_response(res_list, as_json)
 
+    @lru_cache(maxsize=__cache_size__)
     def __get_top_losers__(self, as_json=False):
         """
         :return: a list of dictionaries containing top losers of the day
@@ -261,6 +245,7 @@ class Nse():
                     for item in res_dict['data']]
         return self.render_response(res_list, as_json)
 
+    @lru_cache(maxsize=__cache_size__)
     def __get_top_volume__(self, as_json=False):
         """
         :return: a lis of dictionaries containing top volume gainers of the day
@@ -273,6 +258,7 @@ class Nse():
             item) for item in res_dict['data']]
         return self.render_response(res_list, as_json)
 
+    @lru_cache(maxsize=__cache_size__)
     def __get_most_active__(self, as_json=False):
         """
         :return: a lis of dictionaries containing most active equites of the day
@@ -285,6 +271,7 @@ class Nse():
             item) for item in res_dict['data']]
         return self.render_response(res_list, as_json)
 
+    @lru_cache(maxsize=__cache_size__)
     def __get_advances_declines__(self, as_json=False):
         """
         :return: a list of dictionaries with advance decline data
@@ -297,6 +284,7 @@ class Nse():
                      for item in resp_dict['data']]
         return self.render_response(resp_list, as_json)
 
+    @lru_cache(maxsize=__cache_size__)
     def __get_index_list__(self, as_json=False):
         """
         get list of indices and codes
@@ -309,6 +297,7 @@ class Nse():
         index_list = [str(item['name']) for item in resp_list]
         return self.render_response(index_list, as_json)
 
+    @lru_cache(maxsize=__cache_size__)
     def is_valid_index(self, code):
         """
         returns: True | Flase , based on whether code is valid
@@ -316,6 +305,7 @@ class Nse():
         index_list = self.__get_index_list__()
         return True if code.upper() in index_list else False
 
+    @lru_cache(maxsize=__cache_size__)
     def get_index_quote(self, code, as_json=False):
         """
         params:
