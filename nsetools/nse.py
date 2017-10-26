@@ -135,13 +135,7 @@ class Nse():
                     else:
                         self.is_market_open = (False, 1)
                     quotes.append(rendered_response)
-        quotes = quotes[0]
-        columns = []
-        rows = []
-        for key, value in quotes.items():
-            columns.append(key)
-            rows.append(value)
-        return pd.DataFrame(rows, columns)
+        return pd.DataFrame(quotes)
 
 
 
