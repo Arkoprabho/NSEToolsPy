@@ -163,7 +163,10 @@ class Nse():
             res = read_url(url, self.headers)
 
             # We need to filter the data from this. The data is at an offset of 39 from the beginning and 8 at the end
-            res = res.read()[39:-8]
+            res = res.read()
+            string_index = re.search('data:', res).span()[1]
+            # Everything under 'data'
+            res = res[string_index+1:]
 
             # Now comes the tricky batshit crazy part.
             # We will iteratively filter each company and append them to a list
@@ -175,10 +178,13 @@ class Nse():
                 end = item.span()[1]
                 # This is the actual data we are interested in
                 string = res[start:end]
-                company_info = json.loads(string)
+                try:
+                    company_info = json.loads(string)
+                    del(company_info['industry'])
+                    data = data.append(company_info, ignore_index=True)
+                except :
+                    pass
                 # We dont care about this. Throw it out
-                del(company_info['industry'])
-                data = data.append(company_info, ignore_index=True)
                 start = end + 1
 
             return data
