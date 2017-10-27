@@ -185,6 +185,29 @@ class Nse():
 
             return data
 
+    def get_top(self, *options, as_json=False):
+        """
+        Gets the top list of the argument specified.
+        :Parameters:
+        as_json: bool
+            Whether to return a json like string, or dict.
+        option: string
+            What to get top of. Possible values: gainers, losers, volume, active, advances decline, index list
+        :Returns: generator that can be used to iterate over the data requested
+        """
+        possible_options = {
+            'GAINERS': self.get_top_gainers,
+            'LOSERS': self.get_top_losers,
+            'VOLUME': self.get_top_volume,
+            'ACTIVE': self.get_most_active,
+            'ADVANCES DECLINE': self.get_advances_declines,
+            'INDEX LIST': self.get_index_list
+        }
+        for item in options:
+            function_to_call = possible_options.get(item.upper())
+            if function_to_call is not None:
+                yield function_to_call(as_json)
+
     def get_top_gainers(self, as_json=False):
         """
         :return: pandas DataFrame | JSON containing top gainers of the day
