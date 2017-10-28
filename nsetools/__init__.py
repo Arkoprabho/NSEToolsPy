@@ -24,4 +24,4 @@
 __VERSION__='1.0.7'
 __author__ = 'Arkoprabho Chakraborti'
 project_url = 'https://github.com/Arkoprabho/nsetools3'
-from .nse import Nse
+from .nse import Nse, NseHolidays
