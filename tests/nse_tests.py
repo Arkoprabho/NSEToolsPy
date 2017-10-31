@@ -10,6 +10,7 @@ import re
 import six
 from nsetools import Nse
 from nsetools.utils import js_adaptor, byte_adaptor, save_file
+from nsetools.nse import market_status
 from tempfile import gettempdir
 
 log = logging.getLogger('nse')
@@ -49,7 +50,7 @@ class TestCoreAPIs(unittest.TestCase):
         self.assertIsInstance(response, pd.DataFrame)
 
     def test_market_status(self):
-        result = self.nse.market_status()
+        result = market_status()
         self.assertIsInstance(result, bool)
 
     def test_response_cleaner(self):
