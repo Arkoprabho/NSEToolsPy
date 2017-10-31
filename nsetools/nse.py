@@ -47,7 +47,7 @@ class Nse():
 
 
         # None indicates that the default value is stored and we havent checked for it.
-        self.is_market_open = True
+        self.is_market_open = False
 
         self.__cache_size__ = cache_size
 
@@ -140,7 +140,26 @@ class Nse():
         Checks whether the market is open or not
         :returns: bool variable indicating status of market. True -> Open, False -> Closed
         """
-        # TODO use a date-time approach rather than a query based approach
+        nse_holidays = NseHolidays()
+        holiday_list = nse_holidays.get_holiday_list()
+
+        # Check if today is a holiday according to the holiday list.
+        if datetime.now().date() in holiday_list:
+            self.is_market_open = False
+            # No point in checking for the time. Today is a holiday.
+            return self.is_market_open
+
+        current_time = datetime.now().time()
+        # Check if the current time is in the time bracket in which NSE operates.
+        # The market opens at 9:15 am
+        start_time = datetime.now().time().replace(hour=9, minute=15, second=0, microsecond=0)
+        # And ends at 3:30 = 15:30
+        end_time = datetime.now().time().replace(hour=15, minute=30, second=0, microsecond=0)
+
+        if current_time > start_time and current_time < end_time:
+            self.is_market_open = True
+
+        # In case the above condition does not satisfy, the default value of is_market_open (False) is returned
         return self.is_market_open
 
     @lru_cache(maxsize=__cache_size__)
