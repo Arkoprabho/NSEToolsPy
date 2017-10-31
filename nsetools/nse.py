@@ -100,7 +100,7 @@ class Nse():
         """
         gets the quote for a given stock code
         :param codes: 
-        :return: list of dicts with quotes of all companies codes passed.
+        :return: pandas DataFrame with quotes of all companies codes passed.
         :raises: HTTPError, URLError
         """
         quotes = []
@@ -135,7 +135,9 @@ class Nse():
                     else:
                         self.is_market_open = (False, 1)
                     quotes.append(rendered_response)
-        return quotes
+        return pd.DataFrame(quotes).set_index('symbol')
+
+
 
     def market_status(self):
         """
@@ -189,36 +191,32 @@ class Nse():
 
             return data
 
-
     def get_top(self, *options, as_json=False):
         """
         Gets the top list of the argument specified.
-
         :Parameters:
         as_json: bool
             Whether to return a json like string, or dict.
         option: string
             What to get top of. Possible values: gainers, losers, volume, active, advances decline, index list
-
         :Returns: generator that can be used to iterate over the data requested
-
         """
         possible_options = {
-            'GAINERS': self.__get_top_gainers__,
-            'LOSERS': self.__get_top_losers__,
-            'VOLUME': self.__get_top_volume__,
-            'ACTIVE': self.__get_most_active__,
-            'ADVANCES DECLINE': self.__get_advances_declines__,
-            'INDEX LIST': self.__get_index_list__
-            }
+            'GAINERS': self.get_top_gainers,
+            'LOSERS': self.get_top_losers,
+            'VOLUME': self.get_top_volume,
+            'ACTIVE': self.get_most_active,
+            'ADVANCES DECLINE': self.get_advances_declines,
+            'INDEX LIST': self.get_index_list
+        }
         for item in options:
             function_to_call = possible_options.get(item.upper())
             if function_to_call is not None:
                 yield function_to_call(as_json)
 
-    def __get_top_gainers__(self, as_json=False):
+    def get_top_gainers(self, as_json=False):
         """
-        :return: a list of dictionaries containing top gainers of the day
+        :return: pandas DataFrame | JSON containing top gainers of the day
         """
         url = self.top_gainer_url
         res = read_url(url, self.headers)
@@ -226,11 +224,15 @@ class Nse():
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(
             item) for item in res_dict['data']]
-        return self.render_response(res_list, as_json)
+        response = self.render_response(res_list, as_json)
+        if as_json:
+            return response
+        else:
+            return pd.DataFrame(response).set_index('symbol')
 
-    def __get_top_losers__(self, as_json=False):
+    def get_top_losers(self, as_json=False):
         """
-        :return: a list of dictionaries containing top losers of the day
+        :return: pandas DataFrame | JSON containing top losers of the day
         """
         url = self.top_loser_url
         res = read_url(url, self.headers)
@@ -238,11 +240,15 @@ class Nse():
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(item)
                     for item in res_dict['data']]
-        return self.render_response(res_list, as_json)
+        response = self.render_response(res_list, as_json)
+        if as_json:
+            return response
+        else:
+            return pd.DataFrame(response).set_index('symbol')
 
-    def __get_top_volume__(self, as_json=False):
+    def get_top_volume(self, as_json=False):
         """
-        :return: a lis of dictionaries containing top volume gainers of the day
+        :return: pandas DataFrame | JSON containing top volume gainers of the day
         """
         url = self.top_volume_url
         res = read_url(url, self.headers)
@@ -250,11 +256,15 @@ class Nse():
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(
             item) for item in res_dict['data']]
-        return self.render_response(res_list, as_json)
+        response = self.render_response(res_list, as_json)
+        if as_json:
+            return response
+        else:
+            return pd.DataFrame(response).set_index('sym')
 
-    def __get_most_active__(self, as_json=False):
+    def get_most_active(self, as_json=False):
         """
-        :return: a lis of dictionaries containing most active equites of the day
+        :return: pandas DataFrame | JSON containing most active equites of the day
         """
         url = self.most_active_url
         res = read_url(url, self.headers)
@@ -262,11 +272,15 @@ class Nse():
         # clean the output and make appropriate type conversions
         res_list = [self.clean_server_response(
             item) for item in res_dict['data']]
-        return self.render_response(res_list, as_json)
+        response = self.render_response(res_list, as_json)
+        if as_json:
+            return response
+        else:
+            return pd.DataFrame(response).set_index('symbol')
 
-    def __get_advances_declines__(self, as_json=False):
+    def get_advances_declines(self, as_json=False):
         """
-        :return: a list of dictionaries with advance decline data
+        :return: pandas DataFrame | JSON with advance decline data
         :raises: URLError, HTTPError
         """
         url = self.advances_declines_url
@@ -274,9 +288,13 @@ class Nse():
         resp_dict = json.load(resp)
         resp_list = [self.clean_server_response(item)
                      for item in resp_dict['data']]
-        return self.render_response(resp_list, as_json)
+        response = self.render_response(resp_list, as_json)
+        if as_json:
+            return response
+        else:
+            return pd.DataFrame(response).set_index('indice')
 
-    def __get_index_list__(self, as_json=False):
+    def get_index_list(self, as_json=False, as_list=False):
         """
         get list of indices and codes
         params: as_json: True | False
@@ -286,13 +304,18 @@ class Nse():
         resp = read_url(url, self.headers)
         resp_list = json.load(resp)['data']
         index_list = [str(item['name']) for item in resp_list]
-        return self.render_response(index_list, as_json)
+        response = self.render_response(index_list, as_json)
+        if as_json or as_list:
+            return response
+        else:
+             for element in response:
+                print(element)
 
     def is_valid_index(self, code):
         """
         returns: True | Flase , based on whether code is valid
         """
-        index_list = self.__get_index_list__()
+        index_list = self.get_index_list(as_list=True)
         return True if code.upper() in index_list else False
 
     def get_index_quote(self, code, as_json=False):
