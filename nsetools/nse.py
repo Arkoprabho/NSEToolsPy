@@ -276,7 +276,6 @@ class Nse():
 
             return data
 
-    @lru_cache(maxsize=__cache_size__)
     def get_top(self, *options, as_json=False):
         """
         Gets the top list of the argument specified.
@@ -498,10 +497,7 @@ class Nse():
         """
         return 'Driver Class for National Stock Exchange (NSE)'
 
-# TODO: Cache using file handling. Add option in each method call to use files as cache.
-# This will act as a more reliable cache. Also, we can cache market data if the market is closed.
-# TODO: get quotes for a series of codes rather than just one.
-# This is IO bound, lets find a way to optimize this, so that mutliple requests can be made at the same time.
+# TODO: This is IO bound, lets find a way to optimize this, so that mutliple requests can be made at the same time.
 # CHECK: Whether this works in Linux. Last i checked it wasnt passing all the tests
 # TODO: concept of portfolio for fetching price in a batch and field which should be captured
 # TODO: Concept of session, just like as in sqlalchemy
