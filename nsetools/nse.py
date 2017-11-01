@@ -302,7 +302,7 @@ class Nse():
             if function_to_call is not None:
                 yield function_to_call(as_json)
 
-    @lru_cache(maxsize=__cache_size__)
+    @conditional_decorator(lru_cache(maxsize=__cache_size__), not market_status())
     def get_top_gainers(self, as_json=False):
         """
         :return: pandas DataFrame | JSON containing top gainers of the day
@@ -319,7 +319,7 @@ class Nse():
         else:
             return pd.DataFrame(response).set_index('symbol')
 
-    @lru_cache(maxsize=__cache_size__)
+    @conditional_decorator(lru_cache(maxsize=__cache_size__), not market_status())
     def get_top_losers(self, as_json=False):
         """
         :return: pandas DataFrame | JSON containing top losers of the day
@@ -336,7 +336,7 @@ class Nse():
         else:
             return pd.DataFrame(response).set_index('symbol')
 
-    @lru_cache(maxsize=__cache_size__)
+    @conditional_decorator(lru_cache(maxsize=__cache_size__), not market_status())
     def get_top_volume(self, as_json=False):
         """
         :return: pandas DataFrame | JSON containing top volume gainers of the day
@@ -353,7 +353,7 @@ class Nse():
         else:
             return pd.DataFrame(response).set_index('sym')
 
-    @lru_cache(maxsize=__cache_size__)
+    @conditional_decorator(lru_cache(maxsize=__cache_size__), not market_status())
     def get_most_active(self, as_json=False):
         """
         :return: pandas DataFrame | JSON containing most active equites of the day
@@ -370,7 +370,7 @@ class Nse():
         else:
             return pd.DataFrame(response).set_index('symbol')
 
-    @lru_cache(maxsize=__cache_size__)
+    @conditional_decorator(lru_cache(maxsize=__cache_size__), not market_status())
     def get_advances_declines(self, as_json=False):
         """
         :return: pandas DataFrame | JSON with advance decline data
@@ -409,7 +409,7 @@ class Nse():
         index_list = self.get_index_list()
         return True if code.upper() in index_list else False
 
-    @lru_cache(maxsize=__cache_size__)
+    @conditional_decorator(lru_cache(maxsize=__cache_size__), not market_status())
     def get_index_quote(self, code, as_json=False):
         """
         params:
