@@ -59,7 +59,8 @@ coverage.xml
 # Sphinx documentation
 sphinx/
 
-
+# Note taking file
+notes.txt
 
 # PyBuilder
 target/
