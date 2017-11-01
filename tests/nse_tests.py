@@ -100,21 +100,16 @@ class TestCoreAPIs(unittest.TestCase):
 
     def test_negative_get_quote(self):
         wrong_code = 'inf'
-        self.assertListEqual(self.nse.get_quote(wrong_code), [])
+        self.assertEqual(self.nse.get_quote(wrong_code), None)
 
     def test_get_quote(self):
         resp = self.nse.get_quote('infy', '20Microns', 'abb')
         self.assertEqual(len(resp), 3)
-        self.assertIsInstance(resp, list)
-        self.assertIsInstance(resp[0], dict)
+        self.assertIsInstance(resp, pd.DataFrame)
         # test json response
         json_resp = self.nse.get_quote('infy', '20Microns', 'abb', as_json=True)
         self.assertEqual(len(json_resp), 3)
         self.assertIsInstance(json_resp[0], str)
-        # reconstruct the original dict from json
-        # this test may raise false alarms in case the
-        # the price changed in that very moment.
-        self.assertDictEqual(resp[0], json.loads(json_resp[0]))
 
     def test_is_valid_code(self):
         code = 'infy'
@@ -139,17 +134,13 @@ class TestCoreAPIs(unittest.TestCase):
         gainer, loser, volume, active, adv_decline, index_list = temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]
         
         # Test these individually
-        self.assertIsInstance(gainer, list)
-        self.assertIsInstance(gainer[0], dict)
+        self.assertIsInstance(gainer, pd.DataFrame)
 
-        self.assertIsInstance(loser, list)
-        self.assertIsInstance(loser[0], dict)
+        self.assertIsInstance(loser, pd.DataFrame)
 
-        self.assertIsInstance(volume, list)
-        self.assertIsInstance(volume[0], dict)
+        self.assertIsInstance(volume, pd.DataFrame)
 
-        self.assertIsInstance(adv_decline, list)
-        self.assertIsInstance(adv_decline[0], dict)
+        self.assertIsInstance(adv_decline, pd.DataFrame)
 
         self.assertIsInstance(index_list, list)
 

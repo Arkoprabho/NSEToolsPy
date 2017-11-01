@@ -232,7 +232,10 @@ class Nse():
                     # Check if the market is open (to avoid repeated network computation)
 
                     quotes.append(rendered_response)
-        return pd.DataFrame(quotes).set_index('symbol')
+        if as_json:
+            return quotes
+        if quotes:
+            return pd.DataFrame(quotes).set_index('symbol')
 
 
     @lru_cache(maxsize=__cache_size__)
@@ -395,19 +398,15 @@ class Nse():
         resp = read_url(url, self.headers)
         resp_list = json.load(resp)['data']
         index_list = [str(item['name']) for item in resp_list]
-        response = self.render_response(index_list, as_json)
-        if as_json or as_list:
-            return response
-        else:
-             for element in response:
-                print(element)
+        return self.render_response(index_list, as_json)
+        
 
     @lru_cache(maxsize=__cache_size__)
     def is_valid_index(self, code):
         """
         returns: True | Flase , based on whether code is valid
         """
-        index_list = self.get_index_list(as_list=True)
+        index_list = self.get_index_list()
         return True if code.upper() in index_list else False
 
     @lru_cache(maxsize=__cache_size__)
