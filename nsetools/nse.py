@@ -235,6 +235,8 @@ class Nse():
             quotes = pool.map(__get_quote__, codes)
         if as_json:
             return quotes
+        # Filter out all the Nones from the list
+        quotes = [x for x in quotes if x is not None]
         if quotes:
             return pd.DataFrame(quotes).set_index('symbol')
 
