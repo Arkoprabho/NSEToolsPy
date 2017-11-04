@@ -10,6 +10,7 @@ from tempfile import gettempdir
 from functools import lru_cache
 from dateutil.parser import parse
 from datetime import date, timedelta, datetime
+from multiprocessing.pool import ThreadPool
 
 from bs4 import BeautifulSoup
 
@@ -207,8 +208,7 @@ class Nse():
         :return: pandas DataFrame with quotes of all companies codes passed.
         :raises: HTTPError, URLError
         """
-        quotes = []
-        for code in codes:
+        def __get_quote__(code):
             code = code.upper()
             if self.is_valid_code(code):
                 url = self.build_url_for_quote(code)
@@ -225,13 +225,14 @@ class Nse():
                     buffer = js_adaptor(buffer)
                     response = self.clean_server_response(
                         ast.literal_eval(buffer)['data'][0])
-                except SyntaxError as err:
-                    raise Exception('ill formatted response')
+                except Exception as err:
+                    raise Exception('Symbol Not Traded today')
                 else:
                     rendered_response = self.render_response(response, as_json)
                     # Check if the market is open (to avoid repeated network computation)
-
-                    quotes.append(rendered_response)
+                return rendered_response
+        with ThreadPool(os.cpu_count()*2) as pool:
+            quotes = pool.map(__get_quote__, codes)
         if as_json:
             return quotes
         if quotes:
