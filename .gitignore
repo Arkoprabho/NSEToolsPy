@@ -10,7 +10,7 @@ __pycache__/
 .ropeproject/
 *~
 # Visual studio generated files
-*.vs
+*.vs*
 *.pyproj*
 *.sln*
 
