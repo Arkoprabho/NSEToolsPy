@@ -1,22 +1,23 @@
 """
 Contains the core APIs
 """
-import ast, re, json, os, sys, inspect, csv
+import ast
+import re
+import json
+import os
+import csv
 
-from urllib.request import build_opener, HTTPCookieProcessor, Request
 from urllib.parse import urlencode
-from http.cookiejar import CookieJar
-from tempfile import gettempdir
 from functools import lru_cache
-from dateutil.parser import parse
-from datetime import date, timedelta, datetime
+from datetime import  timedelta, datetime
 from multiprocessing.pool import ThreadPool
+from dateutil.parser import parse
 
 from bs4 import BeautifulSoup
 
 import pandas as pd
 
-from nsetools.utils import js_adaptor, save_file
+from nsetools.utils import js_adaptor
 from nsetools.net_utils import read_url
 
 class NseHolidays():
@@ -42,7 +43,8 @@ class NseHolidays():
         # These are all the holidays excluding saturdays and sundays
         todays_date = datetime.now().date()
         for  series in clean_holiday_list:
-            # We wish to extract only the trading holidays. The serial number resets after trading holidays i.e when it moves to clearing holidays
+            # We wish to extract only the trading holidays.
+            # The serial number resets after trading holidays i.e when it moves to clearing holidays
             if previous < int(series[0][0]):
                 # Convert to datetime format
                 parsed_date = parse(series[1][0])
@@ -51,14 +53,14 @@ class NseHolidays():
                 previous += 1
 
         # We will now extract the saturdays and sundays
-        d = todays_date
-        d += timedelta(days=6-d.weekday())
-        s = d - timedelta(days=1)
-        while d.year == todays_date.year:
-            holiday_list.append(s)
-            holiday_list.append(d)
-            d += timedelta(days=7)
-            s += timedelta(days=7)
+        date = todays_date
+        date += timedelta(days=6-date.weekday())
+        diff = date - timedelta(days=1)
+        while date.year == todays_date.year:
+            holiday_list.append(diff)
+            holiday_list.append(date)
+            date += timedelta(days=7)
+            diff += timedelta(days=7)
 
         # This is the final holiday list from the current time.
         return holiday_list
@@ -71,12 +73,12 @@ class NseHolidays():
         # Parse the holiday url and extract useful details
         holiday_url = 'https://www.nseindia.com/products/content/equities/equities/mrkt_timing_holidays.htm'
         headers = {'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Host': 'nseindia.com',
-                'Referer': "https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol=INFY&illiquid=0&smeFlag=0&itpFlag=0",
-                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0',
-                'X-Requested-With': 'XMLHttpRequest'
-                }
+                   'Accept-Language': 'en-US,en;q=0.5',
+                   'Host': 'nseindia.com',
+                   'Referer': "https://www.nseindia.com/live_market/dynaContent/live_watch/get_quote/GetQuote.jsp?symbol=INFY&illiquid=0&smeFlag=0&itpFlag=0",
+                   'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:28.0) Gecko/20100101 Firefox/28.0',
+                   'X-Requested-With': 'XMLHttpRequest'
+                   }
         res = read_url(holiday_url, headers)
         res = res.read()
         
@@ -134,7 +136,8 @@ class Nse():
         """
         Initializes a new instance of the Nse class.
         :Parameters:
-            file_caching: (optional) bool variable to indicate whether to use files for caching of non changing data
+            file_caching: (optional) bool variable to indicate whether to use files
+            for caching of non changing data
         """
         self.headers = self.nse_headers()
         # URL list
@@ -151,14 +154,13 @@ class Nse():
         self.__cache_size__ = cache_size
 
     @lru_cache(maxsize=__cache_size__)
-    def get_stock_codes(self, cached=True):
+    def get_stock_codes(self):
         """
         Retreives the equity list from NSE, and stores it in a dataframe.
         
         :Parameters:
         cached: bool
             Whether to cache the data or not. Prefer keeping this true unless you are running into OOM issues.
-        as_json = 
         :return: pandas DataFrame
         """
         res_dataframe = pd.DataFrame()
@@ -225,7 +227,7 @@ class Nse():
                     buffer = js_adaptor(buffer)
                     response = self.clean_server_response(
                         ast.literal_eval(buffer)['data'][0])
-                except Exception as err:
+                except Exception:
                     raise Exception('Symbol Not Traded today')
                 else:
                     rendered_response = self.render_response(response, as_json)
@@ -239,6 +241,15 @@ class Nse():
         quotes = [x for x in quotes if x is not None]
         if quotes:
             return pd.DataFrame(quotes).set_index('symbol')
+    
+    @conditional_decorator(lru_cache(maxsize=__cache_size__), not market_status())
+    def get_history(self, code, from_date, to_date):
+        """
+        Returns the historical data between the given date range
+        """
+        # Can we not get data for more than 100 days. I thought it was 365 days. TODO Check and complete this
+        base_url = 'https://www.nseindia.com/products/dynaContent/common/productsSymbolMapping.jsp'
+
 
 
     @lru_cache(maxsize=__cache_size__)
@@ -275,12 +286,12 @@ class Nse():
                     company_info = json.loads(string)
                     del(company_info['industry'])
                     data = data.append(company_info, ignore_index=True)
-                except :
+                except Exception:
                     pass
                 # We dont care about this. Throw it out
                 start = end + 1
 
-            return data
+            return data.to_json() if as_json else data
 
     def get_top(self, *options, as_json=False):
         """
