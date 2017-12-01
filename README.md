@@ -46,3 +46,12 @@ Detailed Documenation
 =====================
 
 For complete documentation of this project refer to https://arkoprabho.github.io/nsetools3/
+
+# Contributing
+This is primarily a hobby project. There will be stretches of time when there will be very little to no activity in this repo, as sometimes it is tough to balance hobbies and life in general.
+Try promoting the project wherever you can if you liked it. It will bring the attention of more people into this repo and allow for more eyes and brains better than mine to start working on it.
+You can contribute to the project in the following ways:
+
+1. Raise issues [here](https://github.com/Arkoprabho/nsetools3/issues). I will try to fix and solve the issues as soon as possible. They will be top priority at all times. I also urge the community to keep that in mind.
+2. Fork the repository, make changes as you feel suitable. These changes can improve readability, performance or add new features. In case they do enhance performance, add a performance comparison along with the pull requests. I will add frequent contributors to the contributor list to prevent the hassle of submitting pull requests.
+3. Contact me on my email address, for any other way of contributing.
