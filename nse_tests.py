@@ -28,6 +28,18 @@ class TestCoreAPIs(unittest.TestCase):
         ret = self.nse.nse_headers()
         self.assertIsInstance(ret, dict)
 
+    def test_build_url_for_history(self):
+        test_code = 'infy'
+        url = self.nse.build_url_for_history(test_code, '04-01-2016', '30-10-2016')
+        # 'test_code' should be present in the url
+        self.assertIsNotNone(re.search(test_code, url))
+
+    def test_negative_build_url_for_history(self):
+            negative_codes = [1, None]
+            with self.assertRaises(Exception):
+                for test_code in negative_codes:
+                    url = self.nse.build_url_for_history(test_code, '04-01-2016', '30-10-2016')
+
     def test_build_url_for_quote(self):
         test_code = 'infy'
         url = self.nse.build_url_for_quote(test_code)
@@ -110,6 +122,15 @@ class TestCoreAPIs(unittest.TestCase):
         json_resp = self.nse.get_quote('infy', '20Microns', 'abb', as_json=True)
         self.assertEqual(len(json_resp), 3)
         self.assertIsInstance(json_resp[0], str)
+
+    def test_get_history(self):
+        resp = self.nse.get_history(('ABB', '04-01-2010', '30-10-2010'), ('infy', '04-01-2010', '30-10-2010'))
+        self.assertEqual(len(resp), 2)
+        self.assertIsInstance(resp[0], pd.DataFrame)
+
+        resp = self.nse.get_history(('ABB', '04-01-2010', '30-10-2010'), ('infy', '04-01-2010', '30-10-2010'), as_json=True)
+        self.assertEqual(len(resp), 2)
+        self.assertIsInstance(resp[0], str)
 
     def test_is_valid_code(self):
         code = 'infy'

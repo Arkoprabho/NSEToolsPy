@@ -150,6 +150,7 @@ class Nse():
         self.advances_declines_url = 'http://www.nseindia.com/common/json/indicesAdvanceDeclines.json'
         self.index_url = "http://www.nseindia.com/homepage/Indices1.json"
         self.peer_companies_url = 'https://nseindia.com/live_market/dynaContent/live_watch/get_quote/ajaxPeerCompanies.jsp?symbol='
+        self.get_history_url = 'https://www.nseindia.com/products/dynaContent/common/productsSymbolMapping.jsp?'
 
         self.__cache_size__ = cache_size
 
@@ -243,15 +244,57 @@ class Nse():
             return pd.DataFrame(quotes).set_index('symbol')
     
     @conditional_decorator(lru_cache(maxsize=__cache_size__), not market_status())
-    def get_history(self, code, from_date, to_date):
+    def get_history(self, *codes_dates, as_json=False):
         """
-        Returns the historical data between the given date range
+        Gets the historical data between the given date range (inclusive of both).
+        One can pass tuples of code, from_date and to_date to retreive multiple codes at once
+        :param: (codes_dates): should be a tuple containing 3 items as following
+        code: the symbol of the company you want to get the history of
+        from_date: the date from which history is to be retreived (can be a string in the format DD MM YYYY or a datetime.date object)
+        to_date: the last date upto which the history is to be retreived (can be a string in the format DD MM YYYY or a datetime.date object)
+
+        :returns: a pandas dataframe indexed by date containing the history of the symbol in the given date range
         """
-        # Can we not get data for more than 100 days. I thought it was 365 days. TODO Check and complete this
-        base_url = 'https://www.nseindia.com/products/dynaContent/common/productsSymbolMapping.jsp'
+        # Can we not get data for more than 100 days.
+        # To get data for 365 days, we got to download the csv. The csv does not seem to be downloading from a url
+        # So currently we get the data in batches of 100
+        def __get_history__(code_date):
+            code = code_date[0].upper()
+            history_df = pd.DataFrame()
+            if self.is_valid_code(code):
+                # Parse the dates in the correct format
+                if not isinstance(code_date[1], datetime):
+                    start = parse(code_date[1], dayfirst=True)
+                if not isinstance(code_date[2], datetime):
+                    end = parse(code_date[2], dayfirst=True)
+                # Find the difference between the dates and generate batches of 100 days till the end date
+                difference = (end - start).days
+                if difference > 100:
+                    curr_end = start + timedelta(days=100)
+                    while curr_end < end:
+                        url = self.build_url_for_history(code_date[0], datetime.strftime(start, '%d-%m-%Y'), datetime.strftime(curr_end, '%d-%m-%Y'))
+                        res = read_url(url, self.headers)
+                        res = res.read()
+                        curr_data = pd.read_html(res, header=0, index_col='Date')[0]
+                        history_df = history_df.append(curr_data)
+                        start = curr_end + timedelta(days=1)
+                        curr_end += timedelta(days=100)
+                    url = self.build_url_for_history(code_date[0], datetime.strftime(start, '%d-%m-%Y'), datetime.strftime(end, '%d-%m-%Y'))
+                    res = read_url(url, self.headers)
+                    res = res.read()
+                    curr_data = pd.read_html(res, header=0, index_col='Date')[0]
+                    history_df = history_df.append(curr_data)
+                if as_json:
+                    return history_df.to_json()
+                return history_df
+        
+        with ThreadPool(os.cpu_count() * 2) as pool:
+            quotes = pool.map(__get_history__, codes_dates)
+            if len(quotes) == 1:
+                return quotes[0]
+            return quotes
 
-
-
+            
     @lru_cache(maxsize=__cache_size__)
     def get_peer_companies(self, code, as_json=False):
         """
@@ -460,13 +503,31 @@ class Nse():
                 'X-Requested-With': 'XMLHttpRequest'
                 }
 
+    def build_url_for_history(self, code, from_date, to_date):
+        """
+        builds a url which can be requested for a given stock code
+        :param: code: string containing the stock code
+        :return: a string containing the url
+        """
+        'https://www.nseindia.com/products/dynaContent/common/productsSymbolMapping.jsp?symbol=INFY&segmentLink=3&symbolCount=1&series=ALL&dateRange=+&fromDate=04-01-2017&toDate=05-04-2017&dataType=PRICEVOLUMEDELIVERABLE'
+        if code is not None and isinstance(code, str):
+            encoded_args = urlencode(
+                [
+                    ('symbol', code), ('segmentLink', 3), ('symbolCount', 1), ('series', 'ALL'),
+                    ('dateRange', '+'), ('fromDate', from_date), ('toDate', to_date), ('dataType', 'PRICEVOLUMEDELIVERABLE')
+                ]
+            )
+            return self.get_history_url + encoded_args
+        else:
+            raise Exception('Code must be string')
+
     def build_url_for_quote(self, code):
         """
         builds a url which can be requested for a given stock code
         :param code: string containing stock code.
         :return: a url object
         """
-        if code is not None and type(code) is str:
+        if code is not None and isinstance(code, str):
             encoded_args = urlencode(
                 [('symbol', code), ('illiquid', '0'), ('smeFlag', '0'), ('itpFlag', '0')])
             return self.get_quote_url + encoded_args
