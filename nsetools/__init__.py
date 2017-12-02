@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 """
-__VERSION__='1.1.0'
+__VERSION__='1.1.1'
 __author__ = 'Arkoprabho Chakraborti'
 project_url = 'https://github.com/Arkoprabho/nsetools3'
 from .nse import Nse
