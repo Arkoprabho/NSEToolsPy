@@ -258,6 +258,7 @@ class Nse():
         # Can we not get data for more than 100 days.
         # To get data for 365 days, we got to download the csv. The csv does not seem to be downloading from a url
         # So currently we get the data in batches of 100
+        @conditional_decorator(lru_cache(maxsize=self.__cache_size__), not market_status())
         def __get_history__(code_date):
             code = code_date[0].upper()
             history_df = pd.DataFrame()
@@ -275,15 +276,13 @@ class Nse():
                         url = self.build_url_for_history(code_date[0], datetime.strftime(start, '%d-%m-%Y'), datetime.strftime(curr_end, '%d-%m-%Y'))
                         res = read_url(url, self.headers)
                         res = res.read()
-                        curr_data = pd.read_html(res, header=0, index_col='Date')[0]
-                        history_df = history_df.append(curr_data)
+                        history_df = history_df.append(pd.read_html(res, header=0, index_col='Date')[0])
                         start = curr_end + timedelta(days=1)
                         curr_end += timedelta(days=100)
                     url = self.build_url_for_history(code_date[0], datetime.strftime(start, '%d-%m-%Y'), datetime.strftime(end, '%d-%m-%Y'))
                     res = read_url(url, self.headers)
                     res = res.read()
-                    curr_data = pd.read_html(res, header=0, index_col='Date')[0]
-                    history_df = history_df.append(curr_data)
+                    history_df = history_df.append(pd.read_html(res, header=0, index_col='Date')[0])
                 if as_json:
                     return history_df.to_json()
                 return history_df
